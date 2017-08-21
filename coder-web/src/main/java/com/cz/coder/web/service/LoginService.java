@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
-import com.cz.coder.web.constant.ThirdConsoleConstant;
+import com.cz.coder.web.common.constant.CoderWebConstant;
+import com.cz.coder.web.common.exception.BusinessException;
+import com.cz.coder.web.common.properties.GlobalProperties;
 import com.cz.coder.web.dao.dao.AdminDAO;
 import com.cz.coder.web.dao.dao.LoginDAO;
 import com.cz.coder.web.dao.entity.po.MobileCodePO;
 import com.cz.coder.web.dao.entity.vo.LoginVO;
 import com.cz.coder.web.dao.entity.vo.MobileCodeVO;
 import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
-import com.cz.coder.web.exception.BusinessException;
-import com.cz.coder.web.form.login.ChgPsdForm;
-import com.cz.coder.web.form.login.LoginCheckForm;
-import com.cz.coder.web.properties.GlobalProperties;
+import com.cz.coder.web.web.form.login.ChgPsdForm;
+import com.cz.coder.web.web.form.login.LoginCheckForm;
 import com.fq.common.constant.RetCode;
 import com.fq.message.sender.CLSmsSender;
 import com.fq.message.sender.IMessageSender;
@@ -70,7 +70,7 @@ public class LoginService {
 			}
 			
 			// 验证有效期内是否有有效的短信验证码
-			Integer validityOfCode =  ThirdConsoleConstant.VALIDITY_OF_MOBILE_CODE ; 
+			Integer validityOfCode =  CoderWebConstant.VALIDITY_OF_MOBILE_CODE ; 
 			paramMap.put("validityOfMobileCode",  validityOfCode );
 			MobileCodeVO mobileCodeVO = loginDAO.doQueryMobileCodePO(paramMap) ;
 			String mobileCode = null ;
@@ -133,7 +133,7 @@ public class LoginService {
 				param.put("adminName", form.getUserName()) ;
 				param.put("mobileCode", form.getMobileCode()) ;
 				
-				Integer validityOfCode =  ThirdConsoleConstant.VALIDITY_OF_MOBILE_CODE ; 
+				Integer validityOfCode =  CoderWebConstant.VALIDITY_OF_MOBILE_CODE ; 
 				param.put("validityOfMobileCode",  validityOfCode );
 				DateFormatUtil.CREATE_FULL_DATE_STR_DB();
 				param.put("now",  DateFormatUtil.CREATE_FULL_DATE_STR_DB());

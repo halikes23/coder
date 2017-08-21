@@ -29,7 +29,7 @@
 	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/**" />
-			<bean class="com.fq.interceptor.LoginInterceptor">
+			<bean class="com.cz.coder.web.web.interceptor.LoginInterceptor">
 				<property name="sessionUser" value="LOGINUSER" />
 			</bean>
 		</mvc:interceptor>
