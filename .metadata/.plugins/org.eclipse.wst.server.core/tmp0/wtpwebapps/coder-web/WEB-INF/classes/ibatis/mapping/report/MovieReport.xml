@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MovieReportDaoImpl" >
+
+	<delete id="deleteMoviePlayCnt" parameterClass="java.lang.String">
+		delete from r_movie_play_cnt where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMovieBulletScreenCnt" parameterClass="java.lang.String">
+		delete from r_movie_bulletscreen_cnt where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMovieShareCnt" parameterClass="java.lang.String">
+		delete from r_movie_share_cnt where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMovieCollectionCnt" parameterClass="java.lang.String">
+		delete from r_movie_collection_cnt where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMoviePraiseCnt" parameterClass="java.lang.String">
+		delete from r_movie_praise_cnt  where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMovieAddHealCnt" parameterClass="java.lang.String">
+		delete from r_movie_add_heal_cnt where  create_date = #createDate#
+	</delete>
+	
+	<delete id="deleteMovieReport" parameterClass="java.lang.String">
+		delete from r_movie_report where  create_date = #createDate#
+	</delete>
+	
+	<insert id="insertMoviePlayCnt" parameterClass="java.lang.String">
+		insert into r_movie_play_cnt (m_id , create_date , cnt) 
+		select l.m_id m_id , #createDate# , count(1) from l_user_play_log l where l.write_date &lt;= #createDate# group by l.m_id
+	</insert>
+	
+	<insert id="insertMovieBulletScreenCnt" parameterClass="java.lang.String">
+		insert into r_movie_bulletscreen_cnt (m_id , create_date , cnt) 
+		select bs.m_id m_id , #createDate# create_date ,count(bs_id) cnt  from m_danmaku bs  where date_format(bs.write_date, '%Y-%m-%d') &lt;=  #createDate# group by bs.m_id
+	</insert>
+	
+	<insert id="insertMovieShareCnt" parameterClass="java.lang.String">
+		insert into r_movie_share_cnt (m_id , create_date , cnt) 
+		select l.m_id m_id , #createDate#, count(1) from l_user_share_log l where date_format(l.write_date, '%Y-%m-%d') &lt;=  #createDate# group by l.m_id ;
+		
+	</insert>
+	
+	<insert id="insertMovieCollectionCnt" parameterClass="java.lang.String">
+		insert into r_movie_collection_cnt (m_id , create_date , cnt) select mi.m_id m_id , #createDate#  create_date, mi.collection_nums cnt from m_movie_info mi 
+	</insert>
+	
+	<insert id="insertMoviePraiseCnt" parameterClass="java.lang.String">
+		insert into r_movie_praise_cnt (m_id , create_date , cnt) select mi.m_id m_id , #createDate# create_date , mi.like_nums cnt from m_movie_info mi
+	</insert>
+
+	<insert id="insertMovieAddHealCnt" parameterClass="java.lang.String">
+		insert into r_movie_add_heal_cnt (m_id , create_date , cnt) select mpr.m_id , #createDate#  create_date, count(mpr.pmpl_id) cnt from p_project_movie_papa_rel mpr group by m_id
+	</insert>
+	
+	<insert id="insertMovieReport" parameterClass="java.lang.String">
+		insert into r_movie_report (m_id , create_date)
+		select mi.m_id m_id , #createDate# create_date from m_movie_info mi where mi.is_use = 1
+	</insert>
+	
+	<update id="updateMovieReport" parameterClass="java.lang.String">
+		update r_movie_report r 
+		left join r_movie_add_heal_cnt mahc on mahc.m_id = r.m_id and r.create_date = mahc.create_date
+		left join r_movie_bulletscreen_cnt mb on r.m_id = mb.m_id and r.create_date = mb.create_date 
+		left join r_movie_collection_cnt mc on r.m_id = mc.m_id and r.create_date = mc.create_date 
+		left join r_movie_play_cnt mp on r.m_id = mp.m_id and mp.create_date = r.create_date
+		left join r_movie_praise_cnt mpc on r.m_id = mpc.m_id and r.create_date = mpc.create_date
+		left join r_movie_share_cnt ms on ms.m_id = r.m_id and r.create_date = ms.create_date
+		set r.mah_cnt = mahc.cnt , r.mb_cnt = mb.cnt , r.mc_cnt = mc.cnt , r.mp_cnt = mp.cnt ,r.mpr_cnt = mpc.cnt ,r.ms_cnt = ms.cnt
+		where r.create_date = #createDate#
+	</update>
+	
+	<select id="selectMovieReport" parameterClass="com.fq.form.report.QueryMovieReportForm" resultClass="com.fq.dao.entity.vo.report.MovieReportVO">
+		
+			select 
+			    mr.create_date  createDate ,
+			    mr.mah_cnt      mahCnt ,
+			    mr.mb_cnt       mbCnt ,
+			    mr.mc_cnt       mcCnt ,
+			    mr.mp_cnt       mpCnt ,
+			    mr.mpr_cnt      mprCnt ,
+			    mr.ms_cnt       msCnt
+		 	from r_movie_report mr 
+			where mr.m_id = #mId#  and mr.create_date >= #selStartDate#
+		<dynamic>
+			<isNotEmpty property="selEndDate" prepend="and"> <![CDATA[ mr.create_date <= #selEndDate#  ]]> </isNotEmpty>
+		</dynamic>
+		order by mr.create_date desc 
+	</select>
+	
+</sqlMap>

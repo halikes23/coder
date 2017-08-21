@@ -1,0 +1,3 @@
+/workspaces/jnwtv/jnwtv-message/src/main/java/com/fq/message/sender/CLSmsSender.java
+/workspaces/jnwtv/jnwtv-message/src/main/java/com/fq/message/sender/MailSender.java
+/workspaces/jnwtv/jnwtv-message/src/main/java/com/fq/message/sender/IMessageSender.java

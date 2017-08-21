@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="PrivilegeDaoImpl">
+		
+	<!-- 查询操作员 -->
+	<select id="selectAdmin" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+		select  a.a_id adminId , a.user_name userName , a.real_name realName , a.phone adminPhone ,a.mail
+		from 	bp_admin a 
+		where is_use = '1'
+		<dynamic>
+			<isNotEmpty prepend="and" property="userName"> user_name like concat('%',#userName#,'%') </isNotEmpty>
+		</dynamic>
+		order by a.a_id desc
+	</select>
+	
+	<!-- 查询操作员 -->
+	<select id="selectAdminByUserName" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+		select  a.a_id adminId , a.user_name userName , a.real_name realName , a.phone adminPhone, a.mail
+		from 	bp_admin a 
+		where is_use = '1' and a.user_name = #userName#
+		
+	</select>
+	
+	<insert id="insertAdmin" parameterClass="com.fq.dao.entity.po.AdminPO">
+		insert into bp_admin	( user_name  , real_name , pwd 		, phone 	, mail,is_use)
+		values				( #adminName#, #realName#, #pwd# , #adminPhone# ,#mail# ,1)
+	</insert>
+	
+	<update id="deleteAdmin" parameterClass="java.lang.Integer">
+		update bp_admin set is_use = 0 where a_id = #adminId#
+	</update>
+	
+	<update id="updateAdmin" parameterClass="com.fq.dao.entity.po.AdminPO">
+		update bp_admin set real_name=#realName# , phone=#adminPhone# ,mail=#mail# where a_id = #aId#
+	</update>
+	
+	<select id="selectRolesWithAdmin" resultClass="com.fq.dao.entity.vo.privilege.ListAdminRolesVO" parameterClass="java.lang.Integer">
+		select r.role_code roleCode , r.role_name roleName ,
+			case when rel.a_id is null then 'false' when rel.a_id is not null then 'true' end checked
+		from bp_role r
+		left join bp_admin_role_rel rel on r.role_code = rel.role_code and rel.a_id = #adminId# and rel.rec_stat = 'Y'
+		where r.role_stat = 'Y'
+	</select> 
+	
+	<delete id="deleteAdminRoles" parameterClass="java.lang.Integer">
+		delete from bp_admin_role_rel where a_id = #adminId#
+	</delete>
+	
+	<insert id="insertAdminRoleRels" parameterClass="java.util.Map">
+		insert into bp_admin_role_rel 
+			( a_id , role_code , creator , cre_dt )
+		values
+			( #adminId# , #roleCode# , #creator# , now() )
+	</insert>
+	
+	
+	<select id="selectRoles" resultClass="com.fq.dao.entity.vo.privilege.RoleVO" parameterClass="java.util.HashMap">
+		select r.role_code roleCode , r.role_name roleName 
+		from bp_role r
+		where role_stat = 'Y'
+	</select> 
+	
+	<select id="selectRoleByRoleName" resultClass="com.fq.dao.entity.vo.privilege.RoleVO" parameterClass="java.lang.String">
+		select r.role_code roleCode , r.role_name roleName 
+		from bp_role r
+		where role_stat = 'Y' and role_name = #roleName#
+	</select>
+	
+	<insert id="insertRole" parameterClass="com.fq.dao.entity.po.RolePO">
+		insert into bp_role	( role_name , creator 	, cre_dt)
+		values				( #roleName#, #creator#	, now())
+	</insert>
+	
+	<update id="deleteRole" parameterClass="java.lang.Integer">
+		update bp_role set role_stat = 0 where role_code = #roleCode#
+	</update>
+	
+	<delete id="deleteAdminRoleRelByRoleCode" parameterClass="java.lang.Integer">
+		delete from bp_admin_role_rel where role_code = #roleCode#
+	</delete>
+	
+	<select id="selectPrivilegesWithRole" resultClass="com.fq.dao.entity.vo.privilege.ListRolePrivilegesVO" parameterClass="java.lang.Integer">
+		select p.priv_code privCode , p.priv_name privName , p.parent_priv_code parentPrivCode ,
+			case when rel.role_code is null then 'false' when rel.role_code is not null then 'true' end checked
+		from bp_privilege p
+		left join bp_role_priv_rel rel on p.priv_code = rel.priv_code and rel.role_code = #roleCode# and rel.rec_stat = 'Y'
+		order by p.order_index asc
+	</select> 
+	
+	<update id="updateRole" parameterClass="com.fq.dao.entity.po.RolePO">
+		update bp_role r set r.role_name = #roleName# , r.modifier = #modifier# , mod_dt = now()
+		where role_code = #roleCode#
+	</update>
+	
+	<delete id="deleteRolePrivileges" parameterClass="java.lang.Integer">
+		delete from bp_role_priv_rel where role_code = #roleCode#
+	</delete>
+	
+	<insert id="insertRolePriviegeRels" parameterClass="java.util.Map">
+		insert into bp_role_priv_rel  
+			( role_code , priv_code , creator , cre_dt )
+		values
+			( #roleCode# , #privCode# , #creator# , now() )
+	</insert>
+	
+	<select id="selectAdminPriviletes" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO">
+		select distinct p.priv_code privCode , p.priv_name privName , 
+		case when arr.priv_code is null then 'false' when arr.priv_code is not null then 'true' end has
+		from bp_privilege p
+		left join ( 
+			select distinct rpr.PRIV_CODE 
+			from bp_admin_role_rel rel 
+			inner join bp_role_priv_rel rpr on rpr.ROLE_CODE = rel.role_code and rpr.REC_STAT = 'Y' 
+			where rel.a_id = #adminId# and rel.rec_stat = 'Y' and rpr.PRIV_CODE is not null
+		) arr on arr.priv_code = p.priv_code
+
+	</select>
+	
+	<select id="queryLogInfoByLogId" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.OperateLog">
+		select 
+			params 
+		from l_operate_log o
+		where log_id = #logId#
+	</select>
+	
+	<!-- selectUserRecord -->
+	<select id="selectUserRecord" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select 		o.Log_id 	logId , 	o.user_name  userName	,	 a.real_name  realName	 ,	
+				 a.department   department , 	o.operate   operate    , 	o.operate_desc  operateDesc  ,
+ 				 a.phone  		phone ,		  o.write_date  writeDate , 
+ 				 case when params is null then '' when length(params) > 50 then concat(left(params , 50),'...') else params end params
+		from l_operate_log o 
+		left join bp_admin a  on o.user_name = a.user_name
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="realName"> a.real_name like concat('%',#realName#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="phone">  a.phone like concat('%',#phone#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="operateDesc"> o.operate_desc like concat('%',#operateDesc#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="department"> a.department like concat('%',#department#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="selStartDate">
+            	<![CDATA[ date_format(o.write_date, '%Y-%m-%d') >= #selStartDate#  ]]>
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="selEndDate">
+            	<![CDATA[   date_format(o.write_date, '%Y-%m-%d') <= #selEndDate# ]]>
+            </isNotEmpty>
+        </dynamic>
+		order by o.write_date desc
+		
+		<include refid="page"/>
+		
+	</select>
+	
+	<!-- selectUserRecordTotals -->
+	<select id="selectUserRecordTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select 		count(o.Log_id) 
+		from l_operate_log o 
+		left join bp_admin a  on o.user_name = a.user_name
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="realName"> a.real_name like concat('%',#realName#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="phone">  a.phone like concat('%',#phone#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="operateDesc"> o.operate_desc like concat('%',#operateDesc#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="department"> a.department like concat('%',#department#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="selStartDate">
+            	<![CDATA[ date_format(o.write_date, '%Y-%m-%d') >= #selStartDate#  ]]>
+            </isNotEmpty>
+             <isNotEmpty prepend="and" property="selEndDate">
+            	<![CDATA[ date_format(o.write_date, '%Y-%m-%d') <= #selEndDate# ]]>
+            </isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<select id="selectAllPurviewProjectInfo" resultClass="com.fq.dao.entity.vo.project.PurviewProjectInfo">
+		select pi.pi_id  piId , pi.project_name projectName from bp_admin a 
+		right join 	bp_project_admin bp on a.a_id = bp.a_id 
+		left join 	p_project_info pi on bp.pi_id = pi.pi_id
+		where a.a_id = #adminId#
+	</select>
+	
+	<select id="selectAllProjectInfo" resultClass="com.fq.dao.entity.vo.project.PurviewProjectInfo">
+		select pi.pi_id piId , pi.project_name projectName from p_project_info pi 
+	</select>
+	
+	<delete id="deleteAdminProjectPrivilege" parameterClass="java.lang.Integer">
+		delete from bp_project_admin where a_id = #adminId#
+	</delete>
+	
+	<insert id="insertAdminProjectPrivilege" parameterClass="java.util.Map">
+		insert into bp_project_admin (a_id , pi_id) 
+							  values (#aId# , #piId#)
+	</insert>
+</sqlMap>

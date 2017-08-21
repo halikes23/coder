@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="TaskDAOImpl">
+	<!-- 查询任务列表 -->
+	<select id="queryTask" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select spti.ti_id id,spti.task_desc taskDesc,spti.task_reward taskReward,
+			spti.task_demand taskDemand,spti.task_type taskType,spti.is_deleted isDelete,
+			spti.pre_ti_id preTiId,	spti.pos_ti_id posTiId , spti.busi_type busiType , spti.busi_id busiId
+			from sp_task_info spti 
+			<dynamic prepend="where">
+				<isNotEmpty property="taskDesc" prepend="and ">spti.task_desc like concat ('%',#taskDesc#,'%')</isNotEmpty>
+				<isNotEmpty property="taskReward" prepend="and ">spti.task_reward like concat ('%',#taskReward#,'%')</isNotEmpty>
+				<isNotEmpty property="taskType" prepend="and ">spti.task_type = #taskType#</isNotEmpty>
+				<isNotEmpty property="isDelete" prepend="and ">spti.is_deleted = #isDelete#</isNotEmpty>
+			</dynamic>
+			order by id
+	</select>
+	<!-- 获取任务总数 -->
+	<select id="getTaskCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(spti.ti_id)
+			from sp_task_info spti 
+			<dynamic prepend="where">
+				<isNotEmpty property="taskDesc" prepend="and ">spti.task_desc like concat ('%',#taskDesc#,'%')</isNotEmpty>
+				<isNotEmpty property="taskReward" prepend="and ">spti.task_reward like concat ('%',#taskReward#,'%')</isNotEmpty>
+				<isNotEmpty property="taskType" prepend="and ">spti.task_type = #taskType#</isNotEmpty>
+				<isNotEmpty property="isDelete" prepend="and ">spti.is_deleted = #isDelete#</isNotEmpty>
+			</dynamic>
+	</select>
+	<!-- 删除任务 -->
+	<delete id="deleteTask" parameterClass="java.lang.String">
+		delete from sp_task_info where ti_id=#id#
+	</delete>
+	<!-- 修改任务信息 -->
+	<update id="updateTask" parameterClass="java.util.Map">
+		update sp_task_info spti set spti.task_desc=#taskDesc#,
+			spti.task_reward=#taskReward#,spti.task_demand=#taskDemand#,
+			spti.task_type=#taskType#,spti.is_deleted=#isDelete#,
+			spti.pre_ti_id=#preTiId#,spti.pos_ti_id=#posTiId# ,
+			spti.busi_type=#busiType# , spti.busi_id=#busiId#
+		where spti.ti_id = #id#
+	</update>
+	<!-- 添加新任务 -->
+	<insert id="addTask" parameterClass="java.util.Map">
+		insert into sp_task_info (task_desc,task_reward,task_demand,task_type,is_deleted,
+			pre_ti_id , pos_ti_id  , busi_type , busi_id)
+			values
+			(#taskDesc#,#taskReward#,#taskDemand#,#taskType#,#isDelete#,
+			#preTiId#,	#posTiId#  , #busiType#  , #busiId#)
+		<selectKey resultClass="java.lang.String" keyProperty="ti_id" > 
+            select last_insert_id() as ID from sp_task_info limit 1
+        </selectKey> 
+	</insert>
+	<!-- 获取没有后置任务的task -->
+	<select id="getTaskWithNoPos" resultClass="java.util.HashMap">
+		select spti.ti_id tiId,spti.task_desc taskDesc
+			from sp_task_info spti 
+			where spti.pos_ti_id is null
+	</select>
+	<!-- 获取没有前置任务的task -->
+	<select id="getTaskWithNoPre" resultClass="java.util.HashMap">
+		select spti.ti_id tiId,spti.task_desc taskDesc
+			from sp_task_info spti 
+			where spti.pre_ti_id is null
+	</select>
+	<!-- 修改任务的后置id -->
+	<update id="updateTaskPosTiId" parameterClass="java.util.Map">
+		update sp_task_info spti set spti.pos_ti_id = #id# where spti.ti_id =#preTiId#
+	</update>
+	<!-- 修改任务的前置id -->
+	<update id="updateTaskPreTiId" parameterClass="java.util.Map">
+		update sp_task_info spti set spti.pre_ti_id = #id# where spti.ti_id =#posTiId#
+	</update>
+	<!-- 获取task信息 -->
+	<select id="getTaskInfo" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.po.PTaskPO">
+		select spti.ti_id tiId,spti.task_desc taskDesc
+			from sp_task_info spti 
+			where spti.ti_id =#tiId#
+	</select>
+	<!-- 清空任务的后置任务 -->
+	<update id="clearTaskPosTiId" parameterClass="java.lang.String">
+		update sp_task_info spti  set spti.pos_ti_id=null
+			where spti.ti_id=#oldPreTiId#
+	</update>
+	<!-- 清空任务的前置任务 -->
+	<update id="clearTaskPreTiId" parameterClass="java.lang.String">
+		update sp_task_info spti  set spti.pre_ti_id=null
+			where spti.ti_id=#oldPreTiId#
+	</update>
+</sqlMap>

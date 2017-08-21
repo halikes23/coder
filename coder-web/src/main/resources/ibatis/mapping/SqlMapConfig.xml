@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig
+PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+"http://www.ibatis.com/dtd/sql-map-config-2.dtd"> 
+<sqlMapConfig> 
+	<settings useStatementNamespaces ="true" /> 
+	<sqlMap   resource="ibatis/mapping/Common.xml"/>
+	<sqlMap   resource="ibatis/mapping/User.xml"/>
+	<sqlMap   resource="ibatis/mapping/Login.xml"/>
+	<sqlMap   resource="ibatis/mapping/Exchange.xml"/>
+	<sqlMap   resource="ibatis/mapping/UserInfo.xml"/>
+	<sqlMap   resource="ibatis/mapping/HomePage.xml"/>
+	<sqlMap   resource="ibatis/mapping/Privilege.xml"/>
+	<sqlMap   resource="ibatis/mapping/QiniuResource.xml"/>
+	<sqlMap   resource="ibatis/mapping/Gift.xml"/>
+	<sqlMap   resource="ibatis/mapping/Export.xml"/>
+	<sqlMap   resource="ibatis/mapping/Banner.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/ActorReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/ProjectReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/MovieReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/TradeConsumeReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/WeekTradeConsumeReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/AudienceRatingReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/magicwindow/SinaPopularize.xml"/>
+	<sqlMap	  resource="ibatis/mapping/Task.xml"/>
+	<sqlMap	  resource="ibatis/mapping/cartoon/Cartoon.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/UserReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/BtTable.xml"/>
+	<sqlMap   resource="ibatis/mapping/report/NovelIncomeReport.xml"/>
+	<sqlMap   resource="ibatis/mapping/ProductCount.xml"/>
+</sqlMapConfig>

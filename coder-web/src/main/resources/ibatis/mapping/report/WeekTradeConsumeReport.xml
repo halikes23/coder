@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="WeekTradeConsumeReportDaoImpl" >
+
+	<delete id="deleteWeekTradeConsumeReport" parameterClass="java.lang.String">
+		delete from r_week_trade_consume_report where report_date = #reportDate#
+	</delete>
+	
+	<insert id="insertWeekTradeConsumeReport" parameterClass="java.util.Map">
+		insert into r_week_trade_consume_report(create_date , report_date) values( #createDate# , #reportDate# ) ;
+	</insert>
+	
+	<update id="updateFundingReport" parameterClass="java.lang.String">
+		
+		update r_week_trade_consume_report t , (select #reportDate# report_date,count(1) user_cnt, sum(heal_total) jpoint from (
+				select account , sum(heal_total) heal_total from p_project_movie_papa_rel p 
+				where not exists( select 1 from u_user_info u where u.account = p.account and u.is_navy = 'Y' )
+				and p.update_date &lt;= #reportDate#
+				group by p.account
+			) m ) r
+		set 
+			t.funding_user_cnt = r.user_cnt ,
+			t.funding_jpoint_cnt = r.jpoint
+		where t.report_date = r.report_date and t.report_date = #reportDate#
+		
+	</update>
+	
+	<update id="updateFundingWtReport" parameterClass="java.lang.String">
+		
+		update r_week_trade_consume_report t , (select #reportDate# report_date,count(1) user_cnt, sum(heal_total) jpoint from (
+				select account , sum(heal_total) heal_total from p_project_movie_papa_rel p 
+				where 
+					exists (select 1 from tp_trade_app app where app.entity_no = p.account and pmt_state = '2' and busi_code = '7' )
+				and not exists( select 1 from u_user_info u where u.account = p.account and u.is_navy = 'Y' )
+				and p.update_date &lt;= #reportDate#
+				group by p.account
+			) m ) r
+		set 
+			t.funding_user_cnt_wt = r.user_cnt ,
+			t.funding_jpoint_cnt_wt = r.jpoint
+		where t.report_date = r.report_date and t.report_date = #reportDate#
+		
+	</update>
+	
+	<update id="updateLvcReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (select #reportDate# report_date , count(account) user_cnt, sum(unlock_jpoint) unlock_jpoint,  sum(cnt) cnt from (
+		select account , count(1) cnt , sum(p.unlock_jpoint) unlock_jpoint from plc_user_read_permision p 
+		where not exists( select 1 from u_user_info u where u.account = p.account and u.is_navy = 'Y' ) and p.create_dt &lt;= #reportDate#
+		group by p.account ) t ) r 
+		set rpt.lvc_unlock_cnt = r.cnt , rpt.lvc_unlock_user_cnt = r.user_cnt , rpt.lvc_unlock_jpoint_cnt = r.unlock_jpoint
+		where rpt.report_date = r.report_date and rpt.report_date = #reportDate#
+	</update>
+	
+	<update id="updateLvcWtReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (select #reportDate# report_date , count(account) user_cnt, sum(unlock_jpoint) unlock_jpoint,  sum(cnt) cnt from (
+			select account , count(1) cnt , sum(p.unlock_jpoint) unlock_jpoint from plc_user_read_permision p 
+			where not exists( select 1 from u_user_info u where u.account = p.account and u.is_navy = 'Y' ) and p.create_dt &lt;= #reportDate#
+			and p.account in ( select app.entity_no from  tp_trade_app app where app.busi_code = '7' and pmt_state = '2' )
+			group by p.account ) t ) r 
+		set rpt.lvc_unlock_cnt_wt = r.cnt , rpt.lvc_unlock_user_cnt_wt = r.user_cnt , rpt.lvc_unlock_jpoint_cnt_wt = r.unlock_jpoint
+		where rpt.report_date = r.report_date and rpt.report_date = #reportDate#
+	</update>
+	
+	<update id="updateGiftGivingReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (
+			select #reportDate# report_date , count(opr_account ) user_cnt, sum(gift_jpoint) gift_jpoint from (
+			select opr_account , sum(gift_jpoint) gift_jpoint from u_gift_giving g
+			where not exists( select 1 from u_user_info u where u.account = g.opr_account and u.is_navy = 'Y' ) and g.giving_date &lt;= #reportDate# 
+			group by opr_account ) t ) r
+		set rpt.gift_giving_user_cnt = r.user_cnt , rpt.gift_giving_jpoint_cnt = r.gift_jpoint 
+		where rpt.report_date = r.report_date and rpt.report_date = #reportDate# 
+	</update>
+	
+	<update id="updateGiftGivingWtReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (
+			select #reportDate# report_date , count(opr_account ) user_cnt, sum(gift_jpoint) gift_jpoint from (
+			select opr_account , sum(gift_jpoint) gift_jpoint from u_gift_giving g
+			where exists ( select 1 from tp_trade_app p where p.entity_no = g.opr_account and pmt_state = '2' and busi_code = '7')
+			and not exists( select 1 from u_user_info u where u.account = g.opr_account and u.is_navy = 'Y' ) and g.giving_date &lt;= #reportDate# 
+			group by opr_account ) t ) r
+		set rpt.gift_giving_user_cnt_wt = r.user_cnt , rpt.gift_giving_jpoint_cnt_wt = r.gift_jpoint 
+		where rpt.report_date = r.report_date and rpt.report_date = #reportDate# 
+	</update>
+	
+	<update id="updateTradeReport" parameterClass="java.util.Map">
+		update r_week_trade_consume_report rpt , (
+		select #reportDate# report_date , count(distinct entity_no) user_cnt , sum(app_vol) jpoint_cnt from tp_trade_app p
+		where pmt_state = '2' and busi_code = '7'
+		 and not exists( select 1 from u_user_info u where u.account = p.entity_no and u.is_navy = 'Y' ) and p.app_dt &lt; #tightReportDate#
+		 ) r
+		set rpt.trade_user_cnt = user_cnt , rpt.trade_jpoint_cnt = jpoint_cnt
+		where rpt.report_date = #reportDate# and rpt.report_date = r.report_date
+	</update>
+	
+	<select id="queryWeekTradeConsumeReport" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.report.WeekTradeConsumeVO">
+		select 	r.report_date reportDate ,  
+				r.funding_user_cnt fundingUserCnt , 	r.funding_jpoint_cnt fundingJpointCnt ,
+				r.funding_user_cnt_wt fundingUserCntWt ,r.funding_jpoint_cnt_wt fundingJpointCntWt ,
+				r.lvc_unlock_cnt lvcUnlockCnt ,			r.lvc_unlock_user_cnt lvcUnlockUserCnt , 		r.lvc_unlock_jpoint_cnt lvcUnlockJpointCnt ,
+				r.lvc_unlock_cnt_wt lvcUnlockCntWt ,	r.lvc_unlock_user_cnt_wt lvcUnlockUserCntWt ,	r.lvc_unlock_jpoint_cnt_wt lvcUnlockJpointCntWt ,
+				r.gift_giving_user_cnt giftGivingUserCnt ,		r.gift_giving_jpoint_cnt giftGivingJpointCnt ,
+				r.gift_giving_user_cnt_wt giftGivingUserCntWt , 	r.gift_giving_jpoint_cnt_wt giftGivingJpointCntWt ,
+				r.trade_user_cnt tradeUserCnt ,						r.trade_jpoint_cnt tradeJpointCnt ,
+				r.wallpaper_unlock_cnt wallpaperUnlockCnt  ,   r.wallpaper_unlock_jpoint_cnt wallpaperUnlockJpointCnt ,
+				r.wallpaper_unlock_cnt_wt  wallpaperUnlockCntWt , r.wallpaper_unlock_jpoint_cnt_wt  wallpaperUnlockJpointCntWt
+		from r_week_trade_consume_report r
+		<dynamic prepend="where">
+			<isNotEmpty property="selStartDate" prepend="and"> r.report_date &gt;= #selStartDate# </isNotEmpty>
+			<isNotEmpty property="selEndDate" prepend="and"> r.report_date &lt;= #selEndDate# </isNotEmpty>
+		</dynamic>
+		order by r.report_date desc
+	</select>
+	
+	<update id="updateWallpaperReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (
+					select   #reportDate# report_date , count(account) userCnt ,sum(jpoint) jpointNum
+					from (
+						select account ,sum(l.j_point) jpoint 
+						from  l_user_jpoint_log l
+						where  l.op='17'
+						and not exists( select 1 from u_user_info u where u.account =l.account and u.is_navy = 'Y')  and l.write_date  &lt;= #reportDate# 
+						group by account 
+						)t
+					)r
+					set rpt.wallpaper_unlock_cnt =r.userCnt , rpt.wallpaper_unlock_jpoint_cnt = r.jpointNum
+					where rpt.report_date = r.report_date and rpt.report_date = #reportDate# 
+	</update>
+	
+	<update id="updateWallpaperWtReport" parameterClass="java.lang.String">
+		update r_week_trade_consume_report rpt , (
+					select   #reportDate# report_date , count(account) userCnt ,sum(jpoint) jpointNum
+					from (
+						select account , sum(l.j_point)  jpoint 
+						from  l_user_jpoint_log l
+						where  l.op='17'
+						and exists (select 1 from tp_trade_app app where app.entity_no = l.account and pmt_state = '2' and busi_code = '7' )
+						and not exists( select 1 from u_user_info u where u.account =l.account and u.is_navy = 'Y')  and l.write_date  &lt;= #reportDate# 
+						group by account 
+						)t
+					)r
+					set rpt.wallpaper_unlock_cnt_wt =r.userCnt , rpt.wallpaper_unlock_jpoint_cnt_wt = r.jpointNum
+					where rpt.report_date = r.report_date and rpt.report_date = #reportDate# 
+	</update>
+	
+	
+</sqlMap>

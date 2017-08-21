@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ProductCountDaoImpl" >
+	
+	<!-- 用户作品昨日收入 -->
+	<select id="selectUserProductYesterdayIncome" parameterClass="java.lang.Integer" resultClass="java.lang.String" >
+			select sum(t.income) income   from (
+				select
+				truncate(sum(r.jpoint)/100 , 2) income 
+				from r_third_novel_ratio_income_report  r 
+				left  join bp_novel_admin na on na.ni_id = r.ni_id 
+				left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId# and  <![CDATA[ date_sub( curdate(), interval 1 day ) = r.create_date ]]>
+				union all 
+				select 
+				truncate(sum(cir.jpoint )/100 , 2) income 
+				from r_third_cartoon_ratio_income_report cir 
+				left join plc_live_cartoon plc on plc.plc_id = cir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+				left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#  and <![CDATA[ date_sub( curdate(), interval 1 day ) = cir.create_date ]]>
+			)t  
+	</select>
+		
+	<!-- 用户作品本月收入 -->
+	<select id="selectUserProductMonthIncome" parameterClass="java.lang.Integer" resultClass="java.lang.String" >
+		select   truncate(sum(t.monthIncome) ,2 )  totalIncome   from (
+			select    r.create_date  month ,   r.app_income  monthIncome   
+			from r_third_product_month_income_report  r
+			left join bp_novel_admin na on na.ni_id = r.product_id
+			left join bp_admin a on a.a_id = na.a_id  
+			where a.a_id = #adminId# and   <![CDATA[ r.create_date  = date_format(now(),'%Y-%m') and r.product_type = '1' ]]> 
+			group by r.product_id , month 
+			union all 
+			select  cir.create_date  month , cir.app_income   monthIncome  
+			from r_third_product_month_income_report  cir 
+			left join plc_live_cartoon plc on plc.plc_id = cir.product_id
+			left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			left join bp_admin a  on a.a_id = pa.a_id 
+			where a.a_id = #adminId# and   <![CDATA[ cir.create_date = date_format(now(),'%Y-%m')  and cir.product_type = '2'  ]]> 
+			group by cir.product_id, month
+		)t			
+	</select>
+	
+	<!-- 用户作品总收入 -->
+	<select id="selectUserProductTotalIncome" parameterClass="java.lang.Integer" resultClass="java.lang.String" >
+		select   truncate(sum(t.monthIncome) ,2 )  totalIncome   from (
+			select    r.create_date  month ,   r.app_income  monthIncome   
+			from r_third_product_month_income_report  r 
+			left join bp_novel_admin na on na.ni_id = r.product_id  
+			left join bp_admin a on a.a_id = na.a_id  
+			where a.a_id = #adminId# and  r.product_type = 1 
+			group by r.product_id , month 
+			union all 
+			select  mir.create_date  month , mir.app_income   monthIncome 
+			from r_third_product_month_income_report  mir 
+			left join plc_live_cartoon plc on plc.plc_id = mir.product_id 
+			left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			left join bp_admin a  on a.a_id = pa.a_id 
+			where a.a_id = #adminId# and mir.product_type = 2 
+			group by mir.product_id  , month
+		)t	
+	</select>
+	<!-- 用户作品月收入 -->
+	<select id="selectUserProductMonthIncomeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.UserProductMonthIncomeVO">
+		select t.month  month  ,   truncate(sum(t.totalMonthIncome) , 2 )   totalMonthIncome   ,  truncate(sum(t.monthIncome) , 2 )  monthIncome  from (
+			select    r.create_date  month , r.total_income   totalMonthIncome    ,  r.app_income   monthIncome  
+			from r_third_product_month_income_report  r
+			left join bp_novel_admin na on na.ni_id = r.product_id 
+			left join bp_admin a on a.a_id = na.a_id  
+			where a.a_id = #adminId# and r.product_type = 1 
+			group by r.product_id   , month 
+			union all 
+			select  mir.create_date  month , mir.total_income   totalMonthIncome , mir.app_income   monthIncome  
+			from r_third_product_month_income_report  mir 
+			left join plc_live_cartoon plc on plc.plc_id = mir.product_id  
+			left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			left join bp_admin a  on a.a_id = pa.a_id 
+			where a.a_id = #adminId#  and mir.product_type = 2 
+			group by mir.product_id  , month 
+		)t	
+		<dynamic prepend="where">   
+            <isNotEmpty prepend="and" property="date"> t.month =#date#</isNotEmpty> 
+        </dynamic>
+		group by month
+		order by month desc
+		<include refid="page"/>
+	</select>
+	
+	<!-- 用户作品月收入条目统计 -->
+	<select id="selectUserProductMonthIncomeInfoListTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(1) from (
+			select t.month  month  ,   sum(t.totalMonthIncome)  totalMonthIncome   ,  truncate(sum(t.monthIncome) , 2 )  monthIncome  from (
+				select    r.create_date  month , r.total_income   totalMonthIncome    ,  r.app_income   monthIncome  
+				from r_third_product_month_income_report  r
+				left join bp_novel_admin na on na.ni_id = r.product_id 
+				left join bp_admin a on a.a_id = na.a_id  
+				where a.a_id = #adminId# and r.product_type = 1 
+				group by r.product_id   , month 
+				union all 
+				select  mir.create_date  month , mir.total_income   totalMonthIncome , mir.app_income   monthIncome  
+				from r_third_product_month_income_report  mir 
+				left join plc_live_cartoon plc on plc.plc_id = mir.product_id  
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+				left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#  and mir.product_type = 2 
+				group by mir.product_id  , month 
+			)t	
+			<dynamic prepend="where">   
+	            <isNotEmpty prepend="and" property="date"> t.month =#date#</isNotEmpty> 
+	        </dynamic>
+			group by month
+		)s	
+	</select>
+	
+	<!-- 漫画渠道月收入 -->
+	<select id="selectCartoonChannelIncomeByMonth"  parameterClass="java.util.Map" resultClass="java.lang.String" >
+		 select   truncate(sum(ci.income) , 2 )  cartoonChannelIncome 
+		 from r_cartoon_channnel_income ci 
+		 left join plc_live_cartoon plc on plc.plc_id = ci.plc_id 
+		 left join bp_project_admin pa on pa.pi_id = plc.pi_id
+		 left join bp_admin a  on a.a_id = pa.a_id 
+		 where a.a_id = #adminId# and ci.create_date =#month#
+	</select>
+	<!-- 漫画保底金 -->
+	<select id="selectBaseMoneyByMonth"  parameterClass="java.util.Map" resultClass="java.lang.String" >
+		 select   truncate(sum(ci.base_money) , 2 )  baseMoney 
+		 from r_cartoon_channnel_income ci 
+		 left join plc_live_cartoon plc on plc.plc_id = ci.plc_id 
+		 left join bp_project_admin pa on pa.pi_id = plc.pi_id
+		 left join bp_admin a  on a.a_id = pa.a_id 
+		 where a.a_id = #adminId# and ci.create_date =#month#
+	</select>
+			
+	<!-- 用户作品月收入统计 -->	
+	<select id="selectUserMonthIncomeDetailInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.UserProductMonthIncomeVO"> 
+		  select t.createDate month , t.totalIncome totalMonthIncome , t.id id , t.name name ,  t.productType productType , t.channelName channelName  from (
+				select 
+				r.total_income totalIncome , r.product_id id , plc.cartoon_title name ,  r.create_date  createDate , 1 productType   , '三方' channelName  
+				from r_third_product_month_income_report r 
+				left join plc_live_cartoon plc on plc.plc_id = r.product_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id
+			 	where exists (select 1 from r_cartoon_channnel_income ci where ci.create_date = r.create_date and ci.plc_id = r.product_id ) 
+				and a.a_id = #adminId# and r.product_type = '2' 
+				union all 
+				select  
+				truncate(mir.jpoint/100 , 2 )  totalIncome   , mir.plc_id id , plc.cartoon_title name , mir.create_date createDate , 2 productType , '剧能玩' channelName   
+				from  r_third_cartoon_month_income_report mir 
+				left join plc_live_cartoon plc on plc.plc_id = mir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#
+				union all 
+				select  
+				truncate(ir.jpoint/100 , 2 )  totalIncome   , ir.ni_id  id , ni.novel_name name , ir.create_date createDate , 2 productType , '剧能玩' channelName  
+				from  r_third_novel_month_income_report ir 
+				left join n_novel_info ni on ni.ni_id =  ir.ni_id
+				left join bp_novel_admin na on na.ni_id = ni.ni_id 
+			   left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId#
+			)t
+		 <dynamic prepend="where">   
+		 	<isNotEmpty prepend="and" property="name"> t.name like concat('%',#name#,'%')</isNotEmpty>
+		 	<isNotEmpty prepend="and" property="channelName"> t.channelName like concat('%',#channelName#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="date"> t.createDate like concat('%',#date#,'%')</isNotEmpty>
+         </dynamic>
+		 	order by  id desc 	,  month desc  , totalMonthIncome desc 
+		  <include refid="page"/>
+	</select>
+	<!-- 用户作品月收入条目统计 -->	
+	<select id="selectUserMonthIncomeDetailInfoListTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer"> 
+	select count(1) from (
+		 select t.createDate month , t.totalIncome totalMonthIncome , t.id id , t.name name ,  t.productType productType , t.channelName channelName  from (
+				select 
+				r.total_income totalIncome , r.product_id id , plc.cartoon_title name ,  r.create_date  createDate , 1 productType   , '三方' channelName  
+				from r_third_product_month_income_report r 
+				left join plc_live_cartoon plc on plc.plc_id = r.product_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id 
+				where exists (select 1 from r_cartoon_channnel_income ci where ci.create_date = r.create_date and ci.plc_id = r.product_id ) 
+				and a.a_id = #adminId# and r.product_type = '2'
+				union all 
+				select  
+				truncate(mir.jpoint/100 , 2 )  totalIncome   , mir.plc_id id , plc.cartoon_title name , mir.create_date createDate , 2 productType , '剧能玩' channelName   
+				from  r_third_cartoon_month_income_report mir 
+				left join plc_live_cartoon plc on plc.plc_id = mir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#
+				union all 
+				select  
+				truncate(ir.jpoint/100 , 2 )  totalIncome   , ir.ni_id  id , ni.novel_name name , ir.create_date createDate , 2 productType , '剧能玩' channelName  
+				from  r_third_novel_month_income_report ir 
+				left join n_novel_info ni on ni.ni_id =  ir.ni_id
+				left join bp_novel_admin na on na.ni_id = ni.ni_id 
+			   left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId#
+			)t
+		)s
+		 <dynamic prepend="where">   
+            <isNotEmpty prepend="and" property="name"> s.name like concat('%',#name#,'%')</isNotEmpty>
+		 	<isNotEmpty prepend="and" property="channelName"> s.channelName like concat('%',#channelName#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="date"> s.month like concat('%',#date#,'%')</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<!-- 漫画渠道月收入数据统计 -->
+	<select id="selectCartoonChannelIncomeInfo" parameterClass="com.fq.dao.entity.vo.UserProductMonthIncomeVO" resultClass="com.fq.entity.vo.CartoonChannelIncomeVO">
+		 select 
+		 ci.create_date createDate , ci.income income  , cci.channel_name channelName 
+		 from r_cartoon_channnel_income ci 
+		 left join plc_live_cartoon plc on plc.plc_id = ci.plc_id 
+		 left join c_cartoon_channel_info cci  on cci.ci_id = ci.ci_id 
+		 where ci.create_date = #month# and ci.plc_id = #id#
+	</select>		
+	<!-- 查询用户作品集合 -->
+	<select id="selectUserProductInfoList" parameterClass="java.lang.Integer" resultClass="java.util.HashMap">
+		select  t.name name  from (
+			select
+			na.ni_id id , ni.novel_name name  
+			from bp_novel_admin na 
+			left join n_novel_info ni on ni.ni_id = na.ni_id 
+			where na.a_id = #adminId#
+			union all 
+			select 
+			plc.plc_id id , plc.cartoon_title name 
+			from bp_project_admin pa 
+			left join plc_live_cartoon plc on plc.pi_id = pa.pi_id 
+			where pa.a_id = #adminId#
+		)t
+		where t.name is not null
+	</select>	
+	 
+	<select id="selectCartoonMonthChannelIncome" parameterClass="java.util.Map" resultClass="java.lang.String">
+		select  truncate(sum(ci.income) ,2 )   
+		from r_cartoon_channnel_income ci 
+		where ci.create_date = #month# and ci.plc_id = #id# and ci.income_type = '1' 
+	</select>
+	
+	<select id="selectUserMonthIncomeAllInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.UserProductMonthIncomeVO">
+		select t.createDate month , sum(t.totalIncome) totalMonthIncome , t.id id , t.name name  , '所有渠道' channelName , t.productType productType from (
+				select  
+				truncate(mir.jpoint/100 , 2 )  totalIncome   , mir.plc_id id , plc.cartoon_title name , mir.create_date createDate , 2 productType , '剧能玩' channelName   
+				from  r_third_cartoon_month_income_report mir 
+				left join plc_live_cartoon plc on plc.plc_id = mir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#
+				union all 
+				select  
+				truncate(ir.jpoint/100 , 2 )  totalIncome   , ir.ni_id  id , ni.novel_name name , ir.create_date createDate , 1 productType , '剧能玩' channelName  
+				from  r_third_novel_month_income_report ir 
+				left join n_novel_info ni on ni.ni_id =  ir.ni_id
+				left join bp_novel_admin na on na.ni_id = ni.ni_id 
+			   left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId#
+			)t
+			<dynamic prepend="where">   
+			 	<isNotEmpty prepend="and" property="name"> t.name like concat('%',#name#,'%')</isNotEmpty>
+	            <isNotEmpty prepend="and" property="date"> t.createDate like concat('%',#date#,'%')</isNotEmpty>
+       	    </dynamic>
+       	    group by month , id
+		 	order by  id desc 	,  month desc  , totalMonthIncome desc 
+		  <include refid="page"/> 
+	</select>
+	
+	<select id="selectUserMonthIncomeAllInfoListTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer"> 
+	 select count(1) from (
+		select t.createDate month , sum(t.totalIncome) totalMonthIncome , t.id id , t.name name  , '所有渠道' channelName , t.productType productType from (
+				select  
+				truncate(mir.jpoint/100 , 2 )  totalIncome   , mir.plc_id id , plc.cartoon_title name , mir.create_date createDate , 2 productType , '剧能玩' channelName   
+				from  r_third_cartoon_month_income_report mir 
+				left join plc_live_cartoon plc on plc.plc_id = mir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+			 	left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId#
+				union all 
+				select  
+				truncate(ir.jpoint/100 , 2 )  totalIncome   , ir.ni_id  id , ni.novel_name name , ir.create_date createDate , 1 productType , '剧能玩' channelName  
+				from  r_third_novel_month_income_report ir 
+				left join n_novel_info ni on ni.ni_id =  ir.ni_id
+				left join bp_novel_admin na on na.ni_id = ni.ni_id 
+			   left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId#
+			)t
+			group by month , id 
+		)s
+		 <dynamic prepend="where">   
+            <isNotEmpty prepend="and" property="name"> s.name like concat('%',#name#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="date"> s.month like concat('%',#date#,'%')</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<select id="selectProductTotalIncome" parameterClass="java.util.Map" resultClass="java.lang.String">
+		select  r.total_income  from r_third_product_month_income_report r where r.create_date = #month# and r.product_id = #id# and r.product_type = '2'
+	</select>
+	
+		
+</sqlMap>

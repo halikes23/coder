@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SinaPopularizeDaoImpl" >
+	<resultMap class="com.fq.dao.entity.vo.sina.SinaPopularizeVO" id="sinaPopularizeVO">
+		<result property="spId" column="spId"/>
+		<result property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="summary" column="summary"/>
+		<result property="imageUri" column="imageUri"/>
+		<result property="contentImageUri" column="contentImageUri"/>
+		<result property="contentUri" column="contentUri"/>
+		<result property="contentFormat" column="contentFormat"/>
+		<result property="productKey" column="productKey"/>
+		<result property="shortUri" column="shortUri"/>
+		<result property="clickBehavior" column="clickBehavior"/>
+		<result property="test" column="test"/>
+		<result property="lastModifiedDate" column="lastModifiedDate"/>
+		<result property="count" column="count"/>
+	</resultMap>
+	<!-- 查询所有的新浪推广记录 -->
+	<select id="listSinaPopularizerRecord" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select csp.sp_id spId,csp.id id,csp.title title,csp.content content,csp.summary summary,csp.image_uri imageUri,csp.content_image_uri contentImageUri,
+			csp.content_uri contentUri,csp.content_format contentFormat,csp.product_key productKey,csp.short_uri shortUri,
+			csp.click_behavior clickBehavior,csp.test test,csp.last_modified_date lastModifiedDate,csp.count count
+		from c_sina_popularize csp
+		<dynamic prepend="where">
+			<isNotEmpty property="title" prepend="and ">csp.title like concat ('%',#title#,'%')</isNotEmpty>
+			<isNotEmpty property="contentFormat" prepend="and ">csp.content_format = #contentFormat#</isNotEmpty>
+			<isNotEmpty property="test" prepend="and ">csp.test = #test#</isNotEmpty>
+		</dynamic>
+		order by csp.sp_id
+		<include refid="page"/>
+	</select>
+	<select id="querySinaPopularizerRecord" parameterClass="java.util.Map" resultMap="sinaPopularizeVO">
+		select csp.sp_id spId,csp.id id,csp.title title,csp.content content,csp.summary summary,csp.image_uri imageUri,csp.content_image_uri contentImageUri,
+			csp.content_uri contentUri,csp.content_format contentFormat,csp.product_key productKey,csp.short_uri shortUri,
+			csp.click_behavior clickBehavior,csp.test test,csp.last_modified_date lastModifiedDate,csp.count count
+		from c_sina_popularize csp
+			where csp.sp_id = #spId#
+	</select>
+	<!-- 查询新浪记录的数量 -->
+	<select id="getSinaPopularizerRecord" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(csp.sp_id)
+			from c_sina_popularize csp
+		<dynamic prepend="where">
+			<isNotEmpty property="title" prepend="and ">csp.title like concat ('%',#title#,'%')</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 删除整条记录 ,其自内容也会被删除-->
+	<delete id="deleteSinaPopularizerRecord" parameterClass="java.lang.String">
+		delete sp,sac,scc from c_sina_popularize sp
+			left join c_sina_content_cate scc   on sp.sp_id=scc.sp_id
+			left join c_sina_app_cate sac on sp.sp_id=sac.sp_id
+			where sp.sp_id=#spId#
+	</delete>
+	<!-- 查询app详情 -->
+	<select id="querySinaPopularizerApp" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select sac.sac_id sacId,sac.sp_id spId,sac.app_cate_id appCateId , sac.app_cate_name appCateName
+			from c_sina_app_cate sac 
+	</select>
+	<!-- 查询content详情 -->
+	<select id="querySinaPopularizerContent" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select scc.scc_id sccId,scc.sp_id spId,scc.content_cate_id contentCateId , scc.content_cate_name contentCateName
+			from c_sina_content_cate scc 
+	</select>
+	<!-- 修改sinaApp -->
+	<update id="changeSinaApp" parameterClass="java.util.Map">
+		update c_sina_app_cate  sac set sac.sp_id=#spId# where sac.sac_id = #sacId#
+	</update>
+	<!-- 修改sinaContent -->
+	<update id="changeSinaContent" parameterClass="java.util.Map">
+		update c_sina_content_cate  scc set scc.sp_id=#spId# where scc.scc_id = #sccId#
+	</update>
+	<update id="updateSinaPopularizerInfo" parameterClass="com.fq.dao.entity.vo.sina.SinaPopularizeVO">
+		update c_sina_popularize sp set sp.title=#title#,sp.content=#content#,
+			sp.summary=#summary#,sp.image_uri=#imageUri#,sp.content_image_uri=#contentImageUri#,
+			sp.content_uri=#contentUri#,sp.content_format=#contentFormat#,
+			sp.short_uri=#shortUri#,sp.click_behavior=#clickBehavior#,sp.test=#test#,
+			sp.last_modified_date=#lastModifiedDate#,sp.count=#count#
+			where sp.sp_id=#spId#
+	</update>
+	<!-- 删除所有的content通过spId -->
+	<delete id="deleteSinaPopularizerContent" parameterClass="java.lang.Integer">
+		delete  from c_sina_content_cate where sp_id=#spId#
+	</delete>
+	<!-- 删除所有的App通过spId -->
+	<delete id="deleteSinaPopularizerApp" parameterClass="java.lang.Integer">
+		delete  from c_sina_app_cate where sp_id=#spId#
+	</delete>
+	<!-- 通过sccId获取content记录 -->
+	<select id="getSinaPopularizeContentBySccId" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.sina.SinaContentCateVO">
+		select scc.scc_id sccId,scc.sp_id spId,scc.content_cate_id contentCateId,scc.content_cate_name contentCateName
+		from c_sina_content_cate scc
+		where scc.scc_id = #sccId#
+	</select>
+	<!-- 通过sacId获取app记录 -->
+	<select id="getSinaPopularizeAppBySacId" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.sina.SinaAppCateVO">
+		select sac.sac_id sacId,sac.sp_id spId,sac.app_cate_id appCateId,sac.app_cate_name appCateName
+		from c_sina_app_cate sac
+		where sac.sac_id = #sacId#
+	</select>
+	<!-- 插入一条content记录 -->
+	<insert id="addSinaPopularizerContent" parameterClass="com.fq.dao.entity.vo.sina.SinaContentCateVO">
+		insert into c_sina_content_cate 
+		(sp_id	,	content_cate_id,	content_cate_name) 
+		values 
+		(#spId#,	#contentCateId#,	#contentCateName#)
+	</insert>
+	<!-- 插入一条app记录 -->
+	<insert id="addSinaPopularizerApp" parameterClass="com.fq.dao.entity.vo.sina.SinaAppCateVO">
+		insert into c_sina_app_cate 
+		(sp_id	,	app_cate_id,	app_cate_name) 
+		values 
+		(#spId#,	#appCateId#,	#appCateName#)
+	</insert>
+	<delete id="deleteSinaPopularizerContentBySccId" parameterClass="java.lang.String">
+		delete from c_sina_content_cate  where scc_id = #sccId#
+	</delete>
+	<delete id="deleteSinaPopularizerAppBySacId" parameterClass="java.lang.String">
+		delete from c_sina_app_cate  where sac_id = #sacId#
+	</delete>
+	<!-- 插入sinapopular -->
+	<insert id="insertSinaPopularizerInfo" parameterClass="com.fq.dao.entity.vo.sina.SinaPopularizeVO">
+		insert into c_sina_popularize (id,title,content,summary,image_uri,content_image_uri,
+			content_uri,content_format,short_uri,click_behavior,test,last_modified_date,count)
+		values
+		(#id#,#title#,#content#,#summary#,#imageUri#,#contentImageUri#,#contentUri#,
+			#contentFormat#,#shortUri#,#clickBehavior#,#test#,#lastModifiedDate#,#count#)
+	</insert>
+	<select id="getSinaPopularizerById" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select csp.sp_id spId from c_sina_popularize csp where csp.id=#id# 
+	</select>
+</sqlMap>

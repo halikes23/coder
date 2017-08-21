@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserReportDaoImpl" >
+
+	<select id="selectUserReportByDate" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.report.UserReportVO">
+		select r.create_date createDate , r.new_user_cnt newUserCnt , r.user_total_cnt userTotalCnt ,r.vip_cnt vipCnt , 
+			   r.active_cnt activeCnt , r.month_active_cnt monthActiveCnt , r.behavior_cnt behaviorCnt
+		from r_user_report r 
+		where r.create_date = #createDate#
+	</select>
+		
+	<insert id="insertNewUserCnt" parameterClass="java.lang.String">
+		insert into r_user_report  
+		select 
+		 #createDate#  ,  count(1) newUserCnt  , 0 , 0 , 0 , 0 , 0
+		from u_user_info ui 
+		where date_format(ui.write_date , '%Y-%m-%d' ) = #createDate# and ui.way != 2 
+	</insert>
+	
+	<update id="updateUserReportCnt" parameterClass="java.lang.String">
+		update  r_user_report  
+		set user_total_cnt = (
+			select count(1) from u_user_info ui 
+			where date_format(ui.write_date , '%Y-%m-%d' ) &lt;= #createDate# and ui.way != 2 
+		) , 
+	    vip_cnt = (
+			select count(1) from u_user_info ui 
+			where date_format(ui.write_date , '%Y-%m-%d' ) &lt;= #createDate# and ui.is_vip = 'Y' and ui.way != 2 
+		),
+		active_cnt = (
+			select count(distinct(l.account)) from l_user_jpoint_log l 
+			where l.op = '5' and  l.is_test = 'N' and date_format(l.write_date , '%Y-%m-%d' ) = #createDate# 
+		),
+		month_active_cnt = (
+			select count(distinct(ujl.account)) from l_user_jpoint_log ujl 
+			where ujl.op = '5' and ujl.is_test = 'N' and 
+			 <![CDATA[ DATE_ADD(#createDate#,interval -day(#createDate#)+1 day)<= date_format(ujl.write_date ,'%Y-%m-%d' ) and 
+			 		   #createDate# >=date_format(ujl.write_date ,'%Y-%m-%d' )
+			 ]]>
+		),
+		behavior_cnt = (
+			select count(t.account)   from (
+			select distinct(cb.account) account  from   plc_chapter_barrage cb  where substring(cb.create_dt , 1 , 10) = #createDate# 
+			union 
+			select distinct(d.account) account   from m_danmaku d  where substring(d.write_date , 1 , 10) = #createDate# 
+			union 
+			select distinct(gg.opr_account) account from   u_gift_giving gg where substring(gg.giving_date ,  1 , 10) = #createDate# 
+			union 
+			select distinct(pli.account) account  from  p_project_log_info  pli where substring(pli.create_date ,  1 , 10) = #createDate# 
+			union 
+			select distinct(plc.opr_account) account from p_project_log_comment plc where substring(plc.create_date ,1 , 10) = #createDate# 
+			union 
+			select distinct(plp.opr_account) account from  p_project_log_praise plp where substring(plp.create_date , 1 , 10) = #createDate# 
+			union 
+			select distinct(pc.user_account) account  from  p_project_comment pc where substring(pc.create_date , 1 , 10) = #createDate# 
+			union 
+			select distinct(pcr.opr_account) account  from  p_project_comment_reply pcr where substring(pcr.create_date , 1 , 10) = #createDate# 
+			union 
+			select distinct(pcp.opr_account) account  from p_project_comment_praise pcp where substring(pcp.create_date , 1 , 10) = #createDate# 
+			)t
+		)
+		where create_date = #createDate#		
+			
+	</update>
+	
+	<update id="updateUserReportByTotalCnt" parameterClass="java.util.Map">
+		update  r_user_report r ,(  
+		   select r.new_user_cnt cnt   from r_user_report r 
+			where r.create_date = #createDate# 
+			) t ,
+			(
+				select count(1) cnt from u_user_info ui 
+				where date_format(ui.write_date, '%Y-%m-%d' ) &lt;= #createDate# and ui.is_vip = 'Y' and ui.way != 2 
+			) vip ,
+			(
+				select  count(distinct(l.account)) cnt from l_user_jpoint_log l 
+				where l.op = '5' and  l.is_test = 'N' and date_format(l.write_date, '%Y-%m-%d' ) = #createDate#
+			) active ,
+			(
+				select count(distinct(ujl.account)) cnt from l_user_jpoint_log ujl 
+				where ujl.op = '5' and ujl.is_test = 'N' and 
+				 <![CDATA[ DATE_ADD(#createDate#,interval -day(#createDate#)+1 day)<= date_format(ujl.write_date ,'%Y-%m-%d' ) and 
+				 		   #createDate# >=date_format(ujl.write_date ,'%Y-%m-%d' )
+				 ]]>
+			) monthActive ,
+			(	
+				select count(t.account)  cnt  from (
+				select distinct(cb.account) account  from   plc_chapter_barrage cb  where substring(cb.create_dt , 1 , 10) = #createDate# 
+				union 
+				select distinct(d.account) account   from m_danmaku d  where substring(d.write_date , 1 , 10) = #createDate# 
+				union 
+				select distinct(gg.opr_account) account from   u_gift_giving gg where substring(gg.giving_date ,  1 , 10) = #createDate# 
+				union 
+				select distinct(pli.account) account  from  p_project_log_info  pli where substring(pli.create_date ,  1 , 10) = #createDate# 
+				union 
+				select distinct(plc.opr_account) account from p_project_log_comment plc where substring(plc.create_date ,1 , 10) = #createDate# 
+				union 
+				select distinct(plp.opr_account) account from  p_project_log_praise plp where substring(plp.create_date , 1 , 10) = #createDate# 
+				union 
+				select distinct(pc.user_account) account  from  p_project_comment pc where substring(pc.create_date , 1 , 10) = #createDate# 
+				union 
+				select distinct(pcr.opr_account) account  from  p_project_comment_reply pcr where substring(pcr.create_date , 1 , 10) = #createDate# 
+				union 
+				select distinct(pcp.opr_account) account  from p_project_comment_praise pcp where substring(pcp.create_date , 1 , 10) = #createDate# 
+				)t
+			) behavior
+			
+		set user_total_cnt = t.cnt + #userTotalCnt# , r.vip_cnt = vip.cnt , r.active_cnt = active.cnt , r.month_active_cnt = monthActive.cnt , 
+			r.behavior_cnt = behavior.cnt
+	    
+		where create_date = #createDate#	
+	</update>
+	
+	<!--查询用户统计报表  -->
+	<select id="queryUserReport" parameterClass="com.fq.form.report.QueryUserReportForm" resultClass="com.fq.dao.entity.vo.report.UserReportVO">
+		select 
+		r.create_date createDate , r.new_user_cnt newUserCnt , r.user_total_cnt userTotalCnt ,r.vip_cnt vipCnt , 
+		r.active_cnt activeCnt , r.behavior_cnt  behaviorCnt	, r.month_active_cnt monthActiveCnt 
+		from r_user_report r 
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ r.create_date >=  #selStartDate# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="selEndDate" > <![CDATA[ r.create_date <= #selEndDate#  ]]> </isNotEmpty>
+		</dynamic>
+		order by r.create_date desc
+	</select>
+	
+	<delete id="deleteUserReport" parameterClass="java.lang.String">
+		delete from r_user_report
+		where date_format(create_date , '%Y-%m-%d' ) = #createDate#	
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,13 @@
+package com.fq.constant;
+
+public class KEY_CONSTANT {
+	
+//	public final static String KEY_DOCTOR_TOKEN = "token" ;
+	
+//	public final static String KEY_SICK_TOKEN = "sickToken" ;
+	
+	public final static String KEY_TOKEN = "token";
+	
+	public final static String KEY_RONGCLOUD_TOKEN = "rongcloudToken" ;
+	
+}

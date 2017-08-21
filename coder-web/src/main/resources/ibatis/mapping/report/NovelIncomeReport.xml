@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="NovelIncomeReportDaoImpl" >
+	
+	<select id="queryNovelIncomeReportInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.NovelIncomeReportVO">
+		select  
+		ni.novel_name novelName ,  nir.total_income_cnt totalIncomeCnt  , s.selttle_num selttleNum , nir.ni_id  niId , s.set_date setDate 
+		from r_novel_income_report nir 
+		left join n_novel_info ni on ni.ni_id = nir.ni_id 
+		left join io_origin_book_info bi on bi.b_id = ni.b_id 
+		left join n_novel_income_settle s on s.ni_id = nir.ni_id  
+		where bi.book_source = #source#  and  <![CDATA[DATE_SUB(CURDATE(),INTERVAL 1 DAY) = nir.create_date]]>
+		<dynamic >
+			<isNotEmpty prepend="and" property="niId"> nir.ni_id = #niId#</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryAllNovelIncomeReportInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.NovelIncomeReportVO">
+		select  
+		ni.novel_name novelName ,  nir.total_income_cnt totalIncomeCnt  , s.selttle_num selttleNum  , nir.ni_id  niId , s.set_date setDate
+		from r_novel_income_report nir 
+		left join n_novel_info ni on ni.ni_id = nir.ni_id 
+		left join io_origin_book_info bi on bi.b_id = ni.b_id 
+		left join n_novel_income_settle s on s.ni_id = nir.ni_id 
+		where bi.book_source = #source# and  <![CDATA[DATE_SUB(CURDATE(),INTERVAL 1 DAY) = nir.create_date]]>
+	</select>
+	
+	<select id="selectNovelInfoList" parameterClass="java.util.Map" resultClass="com.fq.entity.vo.novel.NovelInfoVO">
+		select 
+		ni.novel_name novelName  , ni.ni_id niId 
+		from n_novel_info ni
+		where exists (select 1 from io_origin_book_info bi where bi.b_id = ni.b_id  and bi.book_source = #source# )
+	</select>
+	
+	<select id="queryNovelMonthIncomeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.NovelIncomeReportVO">
+		select  
+		nir.ni_id  niId , nir.month_income_cnt monthIncomeCnt , left(nir.create_date , 7) createDate ,  s.set_date setDate ,
+		case 
+		when nir.create_date &gt; s.set_date or s.set_date is null then '未结算'
+		when nir.create_date &lt;= s.set_date then '已结算' 
+		end state 
+ 		from r_novel_income_report nir 
+ 		left join n_novel_income_settle s on s.ni_id = nir.ni_id 
+ 		where nir.ni_id = #niId# and nir.month_income_cnt != 0 
+		<dynamic >
+			<isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format( nir.create_date , '%Y-%m-%d')  >=  #selStartDate# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format( nir.create_date, '%Y-%m-%d')  <=  #selEndDate# ]]>  </isNotEmpty>
+		</dynamic>
+		order by nir.create_date desc 
+	</select>	
+	
+	<select id="queryNovelDayIncomeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.NovelIncomeReportVO">
+		select  
+		nir.ni_id  niId , nir.day_income_cnt dayIncomeCnt , nir.create_date  createDate 
+ 		from r_novel_income_report nir 
+ 		where nir.ni_id = #niId# and nir.create_date like concat(#createDt#,'%')
+		<dynamic >
+			<isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format( nir.create_date , '%Y-%m-%d')  >=  #selStartDate# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format( nir.create_date, '%Y-%m-%d')  <=  #selEndDate# ]]>  </isNotEmpty>
+		</dynamic>
+		order by nir.create_date desc 
+	</select>
+	
+	
+</sqlMap>

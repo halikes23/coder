@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ExchangeDaoImpl" >
+	<resultMap class="com.fq.dao.entity.vo.CdkeyInfoVO" id="cdkeyInfoResult">
+		<result property="cdId"				column="cd_id" />
+		<result property="cdkey"			column="cdkey" />
+		<result property="cdkeyMd5"			column="cdkey_md5" />
+		<result property="account"			column="account" />
+		<result property="jPoint"			column="j_point" />
+		<result property="isUse"			column="is_use" />
+		<result property="exchangeTime"		column="exchange_time" />
+		<result property="producer"			column="producer" />
+		<result property="batchNo"			column="batch_no" />
+		<result property="produceTime"		column="produce_time" />
+		<result property="repeatTimes"		column="repeat_times" />
+		<result property="startDt"			column="start_dt" />
+		<result property="endDt"			column="end_dt" />
+	</resultMap>
+	
+	<resultMap class="com.fq.dao.entity.vo.ExchangeErrorVO" id="exchangeErrorInfoResult">
+		<result property="eelId"			column="eel_id" />
+		<result property="account"			column="account" />
+		<result property="userNick"			column="user_nick" />
+		<result property="errorNo"			column="error_no" />
+		<result property="lastFailTime"     column="last_fail_time"/>
+	</resultMap>
+	
+	<resultMap class="com.fq.dao.entity.vo.UserWarningVO" id="userWarningInfoResult">
+		<result property="uwlId"			column="uwl_id" />
+		<result property="account"			column="account" />
+		<result property="userNick"			column="user_nick" />
+		<result property="dateTime"     	column="date_time"/>
+	</resultMap>
+	
+	<!-- selectCdkeyInfoList -->
+	<select id="selectCdkeyInfoList" parameterClass="java.util.Map"  resultMap="cdkeyInfoResult" >
+		select 	ci.cd_id 	, ci.cdkey 	,			ci.cdkey_md5 	,	ci.account		,	ci.j_point ,
+				ci.is_use 	, ci.exchange_time	 ,	ci.producer ,		ci.batch_no	,		ci.produce_time ,
+				ci.repeat_times  ,ci.start_dt ,		ci.end_dt 
+		from 	c_cdkey_info ci 
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="cdkey"> ci.cdkey like concat('%',#cdkey#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="account">  ci.account like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="jPoint">  ci.j_point =#jPoint#</isNotEmpty>
+            <isNotEmpty prepend="and" property="isUse">  ci.is_use =#isUse#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="producer"> ci.producer like concat('%',#producer#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="batchNo">  ci.batch_no =#batchNo#</isNotEmpty> 
+			<isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(ci.exchange_time, '%Y-%m-%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(ci.exchange_time, '%Y-%m-%d')     <=  #exchangeEndTime#]]> </isNotEmpty>
+        	<isNotEmpty prepend="and" property="produceStartTime"> <![CDATA[ date_format(ci.produce_time, '%Y-%m-%d')  >=  #produceStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="produceEndTime"> <![CDATA[ date_format(ci.produce_time, '%Y-%m-%d')     <=  #produceEndTime#]]> </isNotEmpty>
+        </dynamic>
+        	order by   ci.produce_time  desc
+		<include refid="page"/>
+	</select>
+	<!--selectCdkeyTotals   -->
+	<select id="selectCdkeyTotals"  parameterClass="java.util.Map"  resultClass="Integer">
+		select  count(ci.cdkey) 
+		from 	c_cdkey_info ci
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="cdkey"> ci.cdkey like concat('%',#cdkey#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="account">  ci.account like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="jPoint">  ci.j_point =#jPoint#</isNotEmpty>
+            <isNotEmpty prepend="and" property="isUse">  ci.is_use =#isUse#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="producer"> ci.producer like concat('%',#producer#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="batchNo">  ci.batch_no =#batchNo#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(ci.exchange_time, '%Y-%m-%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(ci.exchange_time, '%Y-%m-%d')     <=  #exchangeEndTime#]]> </isNotEmpty>
+        	<isNotEmpty prepend="and" property="produceStartTime"> <![CDATA[ date_format(ci.produce_time, '%Y-%m-%d')  >=  #produceStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="produceEndTime"> <![CDATA[ date_format(ci.produce_time, '%Y-%m-%d')     <=  #produceEndTime#]]> </isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<!-- deleteSingleCdkeyInfo -->
+	<delete id="deleteSingleCdkeyInfo" parameterClass="java.util.Map">
+		delete	 from 	c_cdkey_info	
+		where 	 cd_id = #cdId#
+	</delete>
+	
+	<!-- selectExchangeErrorInfoList -->
+	<select id="selectExchangeErrorInfoList" parameterClass="java.util.Map"  resultMap="exchangeErrorInfoResult" >
+		select 		eel.eel_id	 , eel.account 	,ui.user_nick	, eel.error_no 		,eel.last_fail_time
+		from 		l_exchange_error_log eel 
+		left join   u_user_info  ui on eel.account = ui.account
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="account">  eel.account like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="errorNo">  eel.error_no =#errorNo#</isNotEmpty> 
+         	<isNotEmpty prepend="and" property="lastFailStartTime"> <![CDATA[ date_format(eel.last_fail_time, '%Y-%m-%d')  >=  #lastFailStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="lastFailEndTime"> <![CDATA[ date_format(eel.last_fail_time, '%Y-%m-%d')     <=  #lastFailEndTime#]]> </isNotEmpty>
+        </dynamic>
+		<include refid="page"/>
+	</select>
+	
+	<!-- selectExchangeInfoList -->
+	<select id="selectExchangeInfoList"  parameterClass="java.util.Map"  resultClass="Integer">
+		select count(eel.account) 
+		from 	l_exchange_error_log eel
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="account">  eel.account like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="errorNo">  eel.error_no =#errorNo#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="lastFailStartTime"> <![CDATA[ date_format(eel.last_fail_time, '%Y-%m-%d')  >=  #lastFailStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="lastFailEndTime"> <![CDATA[ date_format(eel.last_fail_time, '%Y-%m-%d')     <=  #lastFailEndTime#]]> </isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<!-- deleteSingleExchengeError -->
+	<delete id="deleteSingleExchengeError" parameterClass="java.util.Map">
+		delete	 from 	l_exchange_error_log	
+		where 	 eel_id = #eelId#
+	</delete>
+	
+	<!-- deleteAllExchangeErrorInfo -->
+	<delete id="deleteAllExchangeErrorInfo" >
+		truncate table l_exchange_error_log
+	</delete>
+	
+	<!-- selectUserWarningInfoList -->
+	<select id="selectUserWarningInfoList" parameterClass="java.util.Map"  resultMap="userWarningInfoResult" >
+		select 	uwl.uwl_id , uwl.account , ui.user_nick ,uwl.date_time  
+		from 	l_user_warning_log uwl 
+		left 	join  u_user_info  ui on uwl.account = ui.account
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="account">  uwl.account like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="dateStartTime"> <![CDATA[ date_format(uwl.date_time, '%Y-%m-%d')  >=  #dateStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="dateEndTime"> <![CDATA[ date_format(uwl.date_time, '%Y-%m-%d')     <=  #dateEndTime#]]> </isNotEmpty>
+        </dynamic>
+		<include refid="page"/>
+	</select>
+	
+	<!-- selectUserWarningInfoTotals -->
+	<select id="selectUserWarningInfoTotals" parameterClass="java.util.Map"  resultClass="Integer" >
+		select 	count(uwl.account) 
+		from 	l_user_warning_log uwl 
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="account">  uwl.account like concat('%',#account#,'%')</isNotEmpty> 
+             <isNotEmpty prepend="and" property="dateStartTime"> <![CDATA[ date_format(uwl.date_time, '%Y-%m-%d')  >=  #dateStartTime# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="dateEndTime"> <![CDATA[ date_format(uwl.date_time, '%Y-%m-%d')     <=  #dateEndTime#]]> </isNotEmpty>
+        </dynamic>
+	</select>
+	<!-- deleteSingleUserWarningInfo -->
+	<delete id="deleteSingleUserWarningInfo" parameterClass="java.util.Map">
+		delete	 from 	l_user_warning_log	
+		where 	 uwl_id = #uwlId#
+	</delete>
+	
+	<!-- deleteExchangeErrorLog -->
+	<delete id="deleteExchangeErrorLog" >
+		truncate table l_exchange_error_log
+	</delete>
+	
+	<!--insertNewCDkey 插入新的cdkey -->
+	<insert id="insertNewCDkey" parameterClass="com.fq.dao.entity.po.pay.CDkeyInfoPO" >
+		insert 		into 			c_cdkey_info 				(   
+					cdkey  ,   		cdkey_md5   ,  		account   ,  		j_point   ,  
+					is_use   , 		exchange_time  , 	producer  , 		batch_no  , 
+					produce_time  , repeat_times,		start_dt,			end_dt		)
+		values 	(   #cdKey# ,		#cdkeyMd5#,			#account#,			#jPoint#,
+					#isUse#,		#exchangeTime#,		#producer#,			#batchNo#,
+					#produceTime#,	#repeatTimes# , 	#startDt# ,			#endDt#	)
+	</insert>
+	
+	<!-- selectAppleRechargeInfoList 查询所有apple充值记录 -->
+	<select id="selectAppleRechargeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.AppleRechargeInfoVO">
+		select  t.ta_id   taId  ,     t.entity_no account  	, 	ui.user_nick userNick    ,	 		t.app_vol jpoint 		,   	
+				t.contract_no contractNo ,  t.pmt_state  pmtState  , 		t.receipt_data receiptData ,        
+				CONCAT(t.app_dt,' ',t.app_tm)  date
+		from 	tp_trade_app t 
+		left 	join u_user_info ui on ui.account = t.entity_no
+		where 	t.busi_code = 7 and t.receipt_data is not null
+		<dynamic >     
+            <isNotEmpty prepend="and" property="account"> t.entity_no like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="receiptData"> t.receipt_data like concat('%',#receiptData#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="jpoint"> t.app_vol =#jPoint#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState">  t.pmt_state =#pmtState#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="contractNo"> t.contract_no like concat('%',#contractNo#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="userNick">  ui.user_nick =#userNick#</isNotEmpty> 
+			
+			<isNotEmpty prepend="and" property="exchangeStartTime">  <![CDATA[ date_format(t.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime">  <![CDATA[ date_format(t.app_dt, '%Y-%m-%d')  <= #exchangeEndTime# ]]> </isNotEmpty>
+        </dynamic>
+        order by date desc
+        <include refid="page"/>
+	</select>
+	
+	<!-- selectAppleRechargeTotal -->
+	<select id="selectAppleRechargeTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select  count(t.ta_id)
+		from 	tp_trade_app t 
+		left 	join u_user_info ui on ui.account = t.entity_no
+		where 	t.busi_code = 7 and t.receipt_data is not null
+		<dynamic >     
+            <isNotEmpty prepend="and" property="account"> t.entity_no like concat('%',#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="receiptData"> t.receipt_data like concat('%',#receiptData#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="jpoint"> t.app_vol =#jPoint#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState">  t.pmt_state =#pmtState#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="contractNo"> t.contract_no like concat('%',#contractNo#,'%')   </isNotEmpty>
+            <isNotEmpty prepend="and" property="userNick">  ui.user_nick =#userNick#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="exchangeStartTime">   <![CDATA[ date_format( t.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime">  <![CDATA[ date_format( t.app_dt, '%Y-%m-%d')  <=  #exchangeStartTime#]]>    </isNotEmpty>
+        </dynamic>
+	</select>
+	<!-- selectAppleRechargeTotal -->
+	
+	
+	<!-- selectAppleRechargeInfo -->
+	<select id="selectAppleRechargeInfo" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.TradeAppInfoVO">
+		select  	t.entity_no account , t.app_vol jpoint , t.ta_id taId
+		from 		tp_trade_app t 
+		where 		t.ta_id = #taId#
+	</select>
+	
+	<!-- updateFailRechargeUser -->
+	<update id="updateFailRechargeUser" parameterClass="com.fq.dao.entity.vo.TradeAppInfoVO">
+		update 		tp_trade_app 	set pmt_state = '2' 
+		where 		ta_id = #taId#
+	</update>
+	
+	<!-- updateFailRechargeUserJpoint -->
+	<update id="updateFailRechargeUserJpoint" parameterClass="com.fq.dao.entity.vo.TradeAppInfoVO">
+		update 		u_user_info 	set j_point = j_point + #jpoint# 
+		where  		account = #account#
+	</update>
+	
+	<!-- selectTradeInfoList -->
+	<select id="selectTradeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+		select td.ta_id taId , td.entity_no entityNo ,td.entity_type entityType , 
+		td.app_amt appAmt , td.app_vol appVol , CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+		td.cdkey cdkey ,td.busi_code busiCode ,td.contract_no contractNo ,td.receipt_data receiptData ,td.pmt_state pmtState ,
+		td.pmt_channel pmtChannel
+		from tp_trade_app  td 
+		where td.busi_code = '7'
+		<dynamic>
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="contractNo"> td.contract_no like concat(#contractNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isEqual prepend="and" property="pmtState" compareValue="1"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> td.pmt_state is null </isEqual> 
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  >=  #exchangeStartTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  <=  #exchangeEndTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="pmtChannel"> td.pmt_channel = #pmtChannel#</isNotEmpty>
+        </dynamic>
+        union all 
+		select td.ta_id taId , td.entity_no entityNo ,td.entity_type entityType , 
+		td.app_amt appAmt , td.app_vol appVol , CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+		td.cdkey cdkey ,td.busi_code busiCode ,td.contract_no contractNo ,td.receipt_data receiptData ,td.pmt_state pmtState ,
+		td.pmt_channel pmtChannel
+		from tp_trade_app  td 
+		where td.busi_code = '9' 
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="contractNo"> td.contract_no like concat(#contractNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isEqual prepend="and" property="pmtState" compareValue="1"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> td.pmt_state is null </isEqual> 
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  >=  #exchangeStartTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  <=  #exchangeEndTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="pmtChannel"> td.pmt_channel = #pmtChannel#</isNotEmpty>
+        </dynamic>
+        	order by date desc 
+		<include refid="page"/>
+	</select>
+	
+	<!-- selectHistoryTradeInfoList -->
+	<select id="selectHistoryTradeInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+		select htd.ta_id taId , htd.entity_no entityNo ,htd.entity_type entityType , 
+		htd.app_amt appAmt , htd.app_vol appVol , CONCAT( htd.app_dt , ' ' , htd.app_tm ) date  , 
+		htd.cdkey cdkey ,htd.busi_code busiCode ,htd.contract_no contractNo ,htd.receipt_data receiptData ,htd.pmt_state pmtState  ,
+		htd.pmt_channel pmtChannel
+		from his_trade_app  htd
+		where htd.busi_code = '7'
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> htd.entity_no like concat('%',#entityNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="contractNo"> htd.contract_no like concat(#contractNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> htd.app_vol =#appVol#</isNotEmpty>
+            
+            <isEqual prepend="and" property="pmtState" compareValue="1"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> htd.pmt_state is null </isEqual> 
+            
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  htd.app_dt, '%Y%m%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  htd.app_dt, '%Y%m%d')  <=  #exchangeEndTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="pmtChannel"> htd.pmt_channel = #pmtChannel#</isNotEmpty>
+        </dynamic>
+        order by date desc 
+		<include refid="page"/>
+	</select>
+	
+	<select id="selectTradeInfoTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(td.ta_id)
+		from tp_trade_app  td
+		where td.busi_code in('7' , '9')
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="contractNo"> td.contract_no like concat(#contractNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isEqual prepend="and" property="pmtState" compareValue="1"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> td.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> td.pmt_state is null </isEqual> 
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  >=  #exchangeStartTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format( td.app_dt, '%Y%m%d')  <=  #exchangeEndTime# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="pmtChannel"> td.pmt_channel = #pmtChannel#</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	
+	<select id="selectHistoryTradeInfoTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(htd.ta_id)
+		from his_trade_app  htd
+		where htd.busi_code = '7'
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> htd.entity_no like concat('%',#entityNo#,'%')</isNotEmpty>
+             <isNotEmpty prepend="and" property="contractNo"> htd.contract_no like concat(#contractNo#,'%')</isNotEmpty>  
+            <isNotEmpty prepend="and" property="appVol"> htd.app_vol =#appVol#</isNotEmpty>
+            
+            <isEqual  prepend="and" property="pmtState" compareValue="1"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual  prepend="and" property="pmtState" compareValue="2"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual  prepend="and" property="pmtState" compareValue="3"> htd.pmt_state = #pmtState# </isEqual> 
+            <isEqual  prepend="and" property="pmtState" compareValue="1000"> htd.pmt_state is null </isEqual>
+             
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  htd.app_dt, '%Y%m%d')  >=  #exchangeStartTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  htd.app_dt, '%Y%m%d')  <=  #exchangeEndTime# ]]> </isNotEmpty>
+			<isNotEmpty prepend="and" property="pmtChannel"> htd.pmt_channel = #pmtChannel#</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<!-- selectTradeInfoByAndriodList -->
+	<select id="selectTradeInfoByAndriodList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+		select td.ta_id taId , td.entity_no entityNo ,td.entity_type entityType , 
+		td.app_vol appVol , CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+		td.cdkey cdkey ,td.busi_code busiCode ,td.contract_no contractNo ,td.receipt_data receiptData ,td.pmt_state pmtState 
+		from tp_trade_app  td
+		where td.busi_code = 7 and exists (select 1 from tp_trade_pingpp_app tda where tda.contract_no = td.contract_no) 
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+        </dynamic>
+        order by date desc
+		<include refid="page"/>
+	</select>
+	
+	<select id="selectTradeInfoByAndriodTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(td.ta_id)
+		from tp_trade_app  td
+		where td.busi_code = 7 and exists (select 1 from tp_trade_pingpp_app tda where tda.contract_no = td.contract_no) 
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+            <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- selectTradeInfoByIosList -->
+	<select id="selectTradeInfoByIosList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+		select td.ta_id taId , td.entity_no entityNo ,td.entity_type entityType , 
+		td.app_vol appVol , CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+		td.cdkey cdkey ,td.busi_code busiCode ,td.contract_no contractNo ,td.receipt_data receiptData ,td.pmt_state pmtState 
+		from tp_trade_app  td
+		where td.receipt_data is not null and td.busi_code = 7
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+             <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+        </dynamic>
+        order by date desc
+		<include refid="page"/>
+	</select>
+	
+	<select id="selectTradeInfoByIosTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(td.ta_id)
+		from tp_trade_app  td
+		where td.receipt_data is not null and td.busi_code = 7
+		<dynamic prepend="where">     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+             <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+        </dynamic>
+	</select>	
+	
+	
+	<!-- selectTradeInfoByCdkeyList -->
+	<select id="selectTradeInfoByCdkeyList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO" >
+		select td.ta_id taId , td.entity_no entityNo ,td.entity_type entityType , 
+		td.app_vol appVol , CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+		td.cdkey cdkey ,td.busi_code busiCode ,td.contract_no contractNo ,td.receipt_data receiptData ,td.pmt_state pmtState 
+		from tp_trade_app  td
+		where busi_code = 7 and td.cdkey is not null 
+		<dynamic>     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+			 <isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+        </dynamic>
+        order by date desc
+		<include refid="page"/>
+	</select>
+	
+
+	<select id="selectTradeInfoByCdkeyTotal" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(td.ta_id)
+		from tp_trade_app  td
+		where busi_code = 7 and td.cdkey is not null 
+		<dynamic >     
+            <isNotEmpty prepend="and" property="entityNo"> td.entity_no like concat('%',#entityNo#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="entityType"> td.entity_type = #entityType#</isNotEmpty> 
+            <isNotEmpty prepend="and" property="appVol"> td.app_vol =#appVol#</isNotEmpty>
+            <isNotEmpty prepend="and" property="pmtState"> td.pmt_state =#pmtState#</isNotEmpty>  
+			<isNotEmpty prepend="and" property="exchangeStartTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  >=  #exchangeStartTime# ]]></isNotEmpty>
+			<isNotEmpty prepend="and" property="exchangeEndTime"> <![CDATA[ date_format(  td.app_dt, '%Y-%m-%d')  <=  #exchangeEndTime# ]]></isNotEmpty>
+        </dynamic>
+	</select>	
+	
+	<insert id="insertHisFromTradeAppUnpmt" parameterClass="java.lang.String">
+		insert into his_trade_app 
+		select * from tp_trade_app t where t.app_dt = #date# and ( t.pmt_state = '1' or t.pmt_state is null )
+	</insert>
+	
+	<insert id="insertHisFromTradePingppAppUnpmt" parameterClass="java.lang.String">
+		insert into his_trade_pingpp_app 
+			( 	account , order_no , contract_no , transaction_no  , currency , subject   , amount      , ack_amt       , app_amt     , j_point    , 
+				p_id 	, channel  , client_ip   , app_id , app_dt , app_tm   , pmt_state , charge_json , webhooks_json , check_state , trade_type 
+			 )
+		select 
+				account , order_no , contract_no , transaction_no  , currency , subject   , amount      , ack_amt       , app_amt     , j_point    , 
+				p_id 	, channel  , client_ip   , app_id , app_dt , app_tm   , pmt_state , charge_json , webhooks_json , check_state , trade_type
+		from tp_trade_pingpp_app t where t.app_dt = #date# and ( t.pmt_state = '1' or t.pmt_state is null )
+	</insert>
+	
+	<delete id="deleteTradeAppUnpmt" parameterClass="java.lang.String">
+		delete from tp_trade_app where app_dt = #date# and ( pmt_state = '1' or pmt_state is null )
+	</delete>
+	
+	<delete id="deleteTradePingppUnpmt" parameterClass="java.lang.String">
+		delete from tp_trade_pingpp_app where app_dt = #date# and ( pmt_state = '1' or pmt_state is null )
+	</delete>
+	
+	<delete id="deleteHisTradeApp" parameterClass="java.lang.String">
+		delete from his_trade_app where app_dt = #date# 
+	</delete>
+	
+	<delete id="deleteHisTradePingppApp" parameterClass="java.lang.String">
+		delete from tp_trade_pingpp_app where app_dt = #date#
+	</delete>
+	
+	<!-- insertUserJpointLog -->
+  	<insert id="insertUserJpointLog"   parameterClass="com.fq.dao.entity.po.user.UserJPointLogPO">
+  		insert  	into   			l_user_jpoint_log   				
+  		(   
+			user_sn   ,   	account    ,   				j_point    ,  
+			op   , 			op_id   , 					op_obj   , 
+			write_date ,	op_desc
+		)   		
+		values  			
+		(
+			#userSn#   ,  	#account#  ,				#jPoint# ,
+			#op# 	,		#opId#	,					#opObj#	,
+			#writeDate# ,	#opDesc#
+		)
+  	</insert>
+  	
+  	<update id="updateTradeAppSuccess" parameterClass="java.lang.String">
+  		update tp_trade_app 
+  		set pmt_state = '2' , appeal_state = '2'
+  		where contract_no = #contractNo#
+  	</update>
+  	
+  	<update id="updateTradePingppSuccess" parameterClass="java.lang.String">
+  		update tp_trade_pingpp_app 
+  		set pmt_state = '2'
+  		where contract_no = #contractNo#
+  	</update>
+  	
+  	<select id="queryTradeInfoByContractNo" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+  		select 	td.ta_id taId , 				td.entity_no entityNo ,		td.entity_type entityType , 
+				td.app_amt appAmt , 			td.app_vol appVol , 		CONCAT( td.app_dt , ' ' , td.app_tm ) date  , 
+				td.cdkey cdkey ,				td.busi_code busiCode ,		td.contract_no contractNo ,
+				td.receipt_data receiptData ,	td.pmt_state pmtState 
+		from tp_trade_app  td
+		where td.busi_code = '7' and contract_no = #contractNo#
+  	</select>
+	
+	<select id="queryHistoryTradeInfoByContractNo" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+  		select 	htd.ta_id taId , 				htd.entity_no entityNo ,		htd.entity_type entityType , 
+				htd.app_amt appAmt , 			htd.app_vol appVol , 		CONCAT( htd.app_dt , ' ' , htd.app_tm ) date  , 
+				htd.cdkey cdkey ,				htd.busi_code busiCode ,		htd.contract_no contractNo ,
+				htd.receipt_data receiptData ,	htd.pmt_state pmtState 
+		from his_trade_app  htd
+		where htd.busi_code = '7' and contract_no = #contractNo#
+  	</select>
+  	
+  	<select id="queryOrderComplaintInfoList"  parameterClass="java.util.Map"  resultClass="java.util.HashMap">
+		select 
+ 		 al.al_id alId   ,    al.account account ,  al.contract_no contractNo ,ui.user_nick userNick ,
+ 		 al.res_state resState ,	   ta.pmt_state pmtState , al.create_dt createDt  , al.refuse_reason refuseReason 
+		from u_appeal_log al
+		left join u_user_info ui on ui.account=al.account
+		left join ( select max( tta.app_vol )vol , tta.contract_no  from  tp_trade_app tta group by  tta.contract_no     ) tt on tt.contract_no = al.contract_no 
+		left join tp_trade_app ta on ta.contract_no=al.contract_no and ta.app_vol = tt.vol 
+		<dynamic prepend="where">
+		    <isNotEmpty prepend="and" property="alId">  al.al_id =#alId# </isNotEmpty> 
+            <isNotEmpty prepend="and" property="account"> al.account like concat(#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="contractNo">  al.contract_no  like concat('%',#contractNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="userNick">  ui.user_nick  like concat('%',#userNick#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="resState">   al.res_state =#resState#</isNotEmpty>
+        	<isEqual prepend="and" property="pmtState" compareValue="1"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> ta.pmt_state is null </isEqual> 
+          	<isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format( al.create_dt, '%Y-%m-%d')  >=  #selStartDate# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format( al.create_dt, '%Y-%m-%d')  <=  #selEndDate# ]]>  </isNotEmpty> 
+        </dynamic>
+        order by createDt desc 
+        <include refid="page"/>
+	</select>
+	
+	<select id="queryOrderComplaintInfoListTotals"  parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+		select 
+ 		 count(al.al_id) 
+		from u_appeal_log al
+		left join u_user_info ui on ui.account=al.account
+		left join tp_trade_app ta on ta.contract_no=al.contract_no
+		<dynamic prepend="where">
+		    <isNotEmpty prepend="and" property="alId">  al.al_id =#alId# </isNotEmpty> 
+            <isNotEmpty prepend="and" property="account"> al.account like concat(#account#,'%')</isNotEmpty> 
+            <isNotEmpty prepend="and" property="contractNo">  al.contract_no  like concat('%',#contractNo#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="userNick">  ui.user_nick  like concat('%',#userNick#,'%')</isNotEmpty>
+            <isNotEmpty prepend="and" property="resState">   al.res_state =#resState# </isNotEmpty>
+          	<isEqual prepend="and" property="pmtState" compareValue="1"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="2"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="3"> ta.pmt_state = #pmtState# </isEqual> 
+            <isEqual prepend="and" property="pmtState" compareValue="1000"> ta.pmt_state is null </isEqual>
+            <isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format( al.create_dt, '%Y-%m-%d')  >=  #selStartDate# ]]>  </isNotEmpty>
+			<isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format( al.create_dt, '%Y-%m-%d')  <=  #selEndDate# ]]>  </isNotEmpty>  
+        </dynamic>
+	</select>
+	
+	
+	
+	<select id="queryOrderComplaintInfo"  parameterClass="java.util.Map"  resultClass="java.util.HashMap">
+		select 
+ 		al.al_id alId ,    al.account account ,  al.contract_no contractNo  , al.content content , al.res_state resState ,
+  		al.img_url_list imgUrlList ,          al.create_dt createDt  ,  al.create_tm createTm , al.refuse_reason refuseReason
+		from u_appeal_log al
+		where al_id =#alId#
+	</select>
+	<update id="updateOrderComplaintResState" parameterClass="java.util.Map">
+		update  	u_appeal_log al 
+		set 		al.res_state  = #resState#  , al.refuse_reason = #refuseReason#
+		where 		al.al_id = #alId#  
+	</update>
+	
+	<update id="updateTradeAppAppealState" parameterClass="java.util.Map">
+		update 		tp_trade_app   ta 
+	 	set 		ta.appeal_state = #appealState#
+	 	where 		ta.contract_no = #contractNo#
+	</update>
+	
+	<insert id="updateRefuseReason" parameterClass="java.util.Map">
+		update  u_appeal_log  al 
+		set     al.refuse_reason = #refuseReason#
+		where   al.al_id = #alId#  
+	</insert>
+	
+	<select id="selectVipRepairInfoByAccount" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.VipRepairVO" >
+		select 
+		ui.account account ,  ui.is_vip isVip , ui.vip_out_dt vipOutDt 
+		from  u_user_info ui 
+		where ui.account = #account#
+	</select>
+	
+	<select id="selectAppAmt" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.pay.TradeInfoVO">
+		select  a.app_amt appAmt ,  a.entity_no entityNo  
+		from  tp_trade_app a 
+		where a.contract_no = #contractNo#
+	</select>
+		
+</sqlMap>

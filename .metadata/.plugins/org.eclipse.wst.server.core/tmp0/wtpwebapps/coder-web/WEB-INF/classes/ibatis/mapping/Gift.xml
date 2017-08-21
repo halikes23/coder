@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GiftDaoImpl" >
+	<resultMap class="com.fq.dao.entity.vo.gift.NewCheckUserInfoVO" id="newCheckUserInfoResult">
+		<result property="userSn"			column="user_sn" />
+		<result property="account"          column="account" />
+		<result property="userNick"         column="user_nick" />
+		<result property="mobile"           column="mobile" />
+		<result property="userDesc"         column="user_desc" />
+		<result property="headImgUrl"       column="head_img_url" />
+		<result property="jPoint"           column="j_point" />
+		<result property="rewardMount"      column="reward_mount" />
+		<result property="attentionNums"    column="attention_nums" />
+		<result property="followerNums"     column="follower_nums" />
+		<result property="favouiteNums"     column="favouite_nums" />
+		<result property="userType"         column="user_type" />
+		<result property="sex"              column="sex" />
+		<result property="address"          column="address" />
+		<result property="idNo"     		column="id_no" />
+		<result property="way"     		 	column="way" />
+		<result property="writeDate"        column="write_date" />
+		<result property="headQiniukey"     column="head_qiniukey" />
+		<result property="isActive"         column="is_active" />
+		<result property="userToken"     	column="user_token" />
+		<result property="userRole"     	column="user_role" />
+		<result property="userThirdType"    column="user_third_type" />
+		<result property="openId"     		column="open_id" />
+		<result property="deviceType"     	column="device_type" />
+		<result property="isTester"         column="is_tester" />
+	</resultMap>
+	
+	<resultMap class="com.fq.dao.entity.vo.gift.LikingRelVO" id="likingRelResult">
+		<result property="likingId"			column="liking_id"/>
+		<result property="account1"			column="account1"/>
+		<result property="account2"			column="account2"/>
+		<result property="likingVol"		column="liking_vol"/>
+	</resultMap>
+	
+	
+	<select id="selectGiftInfoList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.gift.GiftInfoVO">
+		select 		gi.gift_id giftId 	, 	gi.gift_name giftName 	, 	gi.gift_img giftImg 	, 	gi.gift_price giftPrice , 
+					gi.gift_greetings giftGreetings  ,	gi.gift_jpoint giftJpoint ,		gi.is_use isUse , 
+					gi.order_index orderIndex 
+		from 		sp_gift_info gi
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="giftName"> gi.gift_name like concat('%',#giftName#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftImg"> gi.gift_img like concat('%',#giftImg#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftPrice"> gi.gift_price = #giftPrice# </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftGreetings"> gi.gift_greetings like concat('%',#giftGreetings#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="isUse"> gi.is_use = #isUse# </isNotEmpty>
+		</dynamic>
+		order by 	 gi.order_index desc , gi.gift_jpoint  asc  
+		<include refid="page"/>
+	</select>
+	
+	
+	<select id="selectGiftInfoTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(gi.gift_id)
+		from   sp_gift_info gi
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="giftName"> gi.gift_name like concat('%',#giftName#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftImg"> gi.gift_img like concat('%',#giftImg#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftPrice"> gi.gift_price = #giftPrice# </isNotEmpty>
+			<isNotEmpty prepend="and" property="giftGreetings"> gi.gift_greetings like concat('%',#giftGreetings#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="isUse"> gi.is_use = #isUse# </isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<update id="updateGiftState" parameterClass="java.util.Map">
+		update sp_gift_info 	set is_use = #isUse# 
+		where  gift_id = #giftId#
+	</update>
+	
+	<insert id="insertIntoGiftInfo" parameterClass="com.fq.form.GiftInfoForm">
+		insert into sp_gift_info (
+								gift_name  , gift_img , gift_price , gift_jpoint , gift_greetings , is_use) 
+					values 		(
+								#giftName# , #giftImg# , #giftPrice# , #giftJpoint# , #giftGreetings# , #isUse#)
+	</insert>
+	
+	<select id="selectGiftDetail" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.gift.GiftInfoVO">
+		select 		gi.gift_id giftId 	, 	gi.gift_name giftName 	, 	gi.gift_img giftImg 	, 	gi.gift_price giftPrice , 
+					gi.gift_greetings giftGreetings  ,	gi.gift_jpoint giftJpoint ,		gi.is_use isUse 
+		from 		sp_gift_info gi
+		where       gi.gift_id = #giftId#
+	</select>
+	
+	<update id="updateGiftInfo" parameterClass="java.util.Map">
+		update sp_gift_info  set gift_name = #giftName# ,  gift_img = #giftImg# , gift_price = #giftPrice#  , gift_jpoint = #giftJpoint# ,
+								gift_greetings = #giftGreetings# , is_use = #isUse#
+							where gift_id = #giftId#
+	</update>
+	
+	<select id="selectSendGiftList" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.gift.GiftGivingVO">
+		select 		g.gg_id ggId 		,	g.opr_account oprAccount  , ui.user_nick  oprUserNick ,	g.apply_account applyAccount , u.user_nick applyUserNick,
+					gi.gift_name giftId 	,	g.giving_date  givingDate , g.apply_date applyDate 		 ,
+					g.opr_msg oprMsg 	,	g.reply_msg replyMsg 	  , g.gift_type giftType 		 , 
+					g.gift_module_id giftModuleId ,	g.is_opened isOpened
+		from 		u_gift_giving g 
+		left join 	sp_gift_info gi  on g.gift_id = gi.gift_id
+		left join   u_user_info ui on ui.account = g.opr_account
+		left join   u_user_info u  on u.account = g.apply_account
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="oprUserNick"> ui.user_nick like concat('%',#oprUserNick#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="applyUserNick"> u.user_nick like concat('%',#applyUserNick#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="oprMsg"> g.opr_msg like concat('%',#oprMsg#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="isOpened"> g.is_opened = #isOpened# </isNotEmpty>
+			 <isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format(g.giving_date, '%Y-%m-%d')  >=  #selStartDate# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format(g.giving_date, '%Y-%m-%d')     <=  #selEndDate#]]> </isNotEmpty>
+		</dynamic>
+		<include refid="page"/>
+	</select>
+	
+	<select id="selectSendGiftTotals" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select 		count(g.gg_id)
+		from 		u_gift_giving g 
+		left join 	sp_gift_info gi  on g.gift_id = gi.gift_id
+		left join   u_user_info ui on ui.account = g.opr_account
+		left join   u_user_info u  on u.account = g.apply_account
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="oprUserNick"> ui.user_nick like concat('%',#oprUserNick#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="applyUserNick"> u.user_nick like concat('%',#applyUserNick#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="oprMsg"> g.opr_msg like concat('%',#oprMsg#,'%') </isNotEmpty>
+			<isNotEmpty prepend="and" property="isOpened"> g.is_opened = #isOpened# </isNotEmpty>
+			<isNotEmpty prepend="and" property="selStartDate"> <![CDATA[ date_format(g.giving_date, '%Y-%m-%d')  >=  #selStartDate# ]]> </isNotEmpty>
+            <isNotEmpty prepend="and" property="selEndDate"> <![CDATA[ date_format(g.giving_date, '%Y-%m-%d')     <=  #selEndDate#]]> </isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="selectAllUserAccount" parameterClass="java.lang.String" resultClass="java.lang.String">
+		<![CDATA[ 
+		select account  
+		from u_user_info
+	    where account  like  concat (#query#,'%')
+	    ]]> 
+	</select>
+	
+	<select id="selectAllGiftInfo" resultClass="com.fq.dao.entity.vo.gift.GiftInfoVO">
+		select 		gi.gift_id giftId 	, 	gi.gift_name giftName 	, 	gi.gift_img giftImg 	, 	gi.gift_price giftPrice , 
+					gi.gift_greetings giftGreetings  ,	gi.gift_jpoint giftJpoint ,		gi.is_use isUse 
+		from 		sp_gift_info gi  
+		where       gi.is_use = 'Y'
+	</select>
+	
+	<select id="checkOprUser" parameterClass="java.util.Map" resultMap="newCheckUserInfoResult">
+  		select 	* 
+  		from  	u_user_info ui 
+  		where 	ui.account = #oprAccount#
+  	</select>
+  	
+  	<select id="checkApplyUser" parameterClass="java.util.Map" resultMap="newCheckUserInfoResult">
+  		select 	* 
+  		from  	u_user_info ui 
+  		where 	ui.account = #applyAccount#
+  	</select>
+  	
+  	<select id="selectGiftDetailInUse" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.gift.GiftInfoVO">
+  		select 		gi.gift_id giftId 	, 	gi.gift_name giftName 	, 	gi.gift_img giftImg 	, 	gi.gift_price giftPrice , 
+					gi.gift_greetings giftGreetings  ,	gi.gift_jpoint giftJpoint ,		gi.is_use isUse 
+		from 		sp_gift_info gi
+		where       gi.gift_id = #giftId#  and  gi.is_use = 'Y'
+  	</select>
+  	
+  	<!-- insertGiftGiving -->
+	<insert id="insertGiftGiving" parameterClass="com.fq.dao.entity.po.GiftGivingPO" >
+	
+		   insert 		into   u_gift_giving  		(	
+					opr_account		, 		apply_account		, 		gift_id		, 
+					giving_date		,		opr_msg				, 		gift_type	, 
+					is_opened	 		,    	liking_vol ) 		
+			select 	#oprAccount#, 			#applyAccount#, 			#giftId#, 
+					#givingDate#, 			#oprMsg#, 					#giftType#, 
+					#isOpened# ,  
+					case 
+						when ulr.liking_vol is null then 0 
+						when ulr.liking_vol is not null then ulr.liking_vol
+					end   likingVol
+					from u_liking_rel ulr 
+					where (		ulr.account1 = #oprAccount# and ulr.account2 = #applyAccount# )   or 
+							(		ulr.account1 = #applyAccount# and ulr.account2 = #oprAccount# )  
+						
+			<selectKey resultClass="int" keyProperty="ggId"> 
+	          <![CDATA[SELECT LAST_INSERT_ID() AS ggId ]]>   
+	        </selectKey>
+	
+	</insert>
+	
+	<!-- addOprUserJpointLog -->
+  	<insert id="addOprUserJpointLog"   parameterClass="com.fq.dao.entity.po.user.UserJPointLogPO">
+  		insert  	into   			l_user_jpoint_log   				(   
+  					user_sn   ,   	account    ,   				j_point    ,  
+  					op   , 			op_id   , 					op_obj   , 
+  					write_date        )   		values  			(
+  					#userSn#   ,  	#account#  ,				#jPoint# ,
+  					#op# 	,		#opId#	,					#opObj#	,
+  					#writeDate#
+  					)
+  	</insert>
+  	
+  	
+  	<update id="updateUserJpoint" parameterClass="java.util.Map">
+  		update 			u_user_info   		ui  
+  		set 			ui.j_point = #totalJpoint# 
+  		where 			ui.account = #account# 
+  	</update>
+  	
+  	
+  	<!-- queryLikingInfoVOByAccount1AndAccount2 -->
+	<select id="queryLikingInfoVOByAccount1AndAccount2" parameterClass="java.util.Map" resultMap="likingRelResult">
+		select 		* 
+		from 	 	u_liking_rel   ulr 
+		where 		(		ulr.account1 = #oprAccount# and ulr.account2 = #applyAccount# )  
+		union  
+		select 		* 
+		from 	 	u_liking_rel   ulr 
+		where 		(		ulr.account1 = #applyAccount# and ulr.account2 = #oprAccount# )  
+	</select>
+	<!-- insertLikingRel -->
+	<insert id="insertLikingRel" parameterClass="com.fq.dao.entity.po.LikingRelPO">
+		INSERT 		INTO  			u_liking_rel   			(  
+					account1, 		account2, 				liking_vol 		) 
+		VALUES 		(#account1#, 	#account2#, 			#likingVol#		)
+	</insert>
+	<!-- updateLikingRelByLikingId  -->
+	<update id="updateLikingRelByLikingId"   parameterClass="com.fq.dao.entity.vo.gift.LikingRelVO" >
+		update 		u_liking_rel  	ulr   
+		set 		ulr.liking_vol 	= #likingVol# 
+		where 		ulr.liking_id = #likingId#   
+	</update>
+	
+	<update id="toUpdateGiftOrderIndex" parameterClass="java.util.Map">
+		update 		sp_gift_info gi 
+		set 		gi.order_index = #orderIndex# 
+		where		gi.gift_id = #giftId#  
+	</update>
+	
+</sqlMap>

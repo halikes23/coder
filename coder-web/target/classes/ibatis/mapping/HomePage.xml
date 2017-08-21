@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="HomePageDaoImpl" >
+		<resultMap id="boutiqueprojectlists" class="com.fq.dao.entity.vo.project.BoutiqueProjectVO">
+			<result property="piId"                 column="pi_id"/>
+			<result property="projectName"          column="project_name"/>
+			<result property="projectCoverUrl"      column="cover_url"/>
+			<result property="projectPlayNums"      column="project_play_nums"/>
+			<result property="projectRewardTotal"   column="project_reward_total"/>
+			<result property="projectTotalEpisode"  column="project_total_episode"/>
+			<result property="projectUpdateEpisode" column="project_update_episode"/>
+			<result property="projectLogNums"       column="project_log_nums"/>
+	        <result property="projectCommentNums"   column="project_comm_nums"/>
+	        <result property="orderIndex"   		column="order_index"/>
+		</resultMap>
+		
+		<resultMap id="crowdfundingprojectlist" class="com.fq.dao.entity.vo.project.CrowdfundingVO">
+			<result property="piId"                 			column="pi_id"/>
+			<result property="projectName"          			column="project_name"/>
+			<result property="projectCoverUrl"      			column="project_cover_url"/>
+			<result property="projectLogNums"       			column="project_log_nums"/>
+			<result property="projectCommentNums"   			column="project_comm_nums"/>
+			<result property="projectOwnerNick"     			column="user_nick"/>
+			<result property="projectDescOriginal"     			column="project_desc_original"/>
+			<result property="projectDesc"     					column="project_desc"/>
+			<result property="projectDescBackground"     		column="project_desc_background"/>
+			<result property="crowdfundingProjectCoverUrl"      column="crowdfunding_project_cover_url"/>
+			<result property="projectTotalEpisode"    		  	column="project_total_episode"/>
+			<result property="projectUpdateEpisode"      		column="project_update_episode"/>
+			<result property="orderIndex"						column="order_index"/>
+		</resultMap>
+	
+		<resultMap class="com.fq.dao.entity.vo.ProjectInfoVO" id="projectInfoResult">
+			<result property="piId"                 			column="pi_id"/>
+			<result property="projectName"          			column="project_name"/>
+		</resultMap>
+	
+		
+	<!-- 查询首页推荐项目（4条） -->
+		<select id="selectBoutiqueProjectLists"  resultMap="boutiqueprojectlists" >
+			select 	 	    pr.pi_id,
+			 			   	pi.project_name,
+			  			 	mi.cover_url,
+					    	pi.project_play_nums,
+			 		    	pi.project_reward_total,
+			 				pi.project_total_episode,
+			 				pi.project_update_episode,
+					    	pi.project_log_nums,
+					    	pi.project_comm_nums,
+					    	pr.order_index
+					    	
+			from        	p_project_recommend pr
+        	left join  	 	p_project_info pi
+			on          	pr.pi_id =pi.pi_id
+		  	left join    	p_project_movie_rel pmr 
+			on 			 	pmr.pi_id = pi.pi_id and pmr.episode_no = pi.project_update_episode 
+		  	left join    	m_movie_info mi 
+			on   		 	mi.m_id = pmr.m_id	
+			where        	pr.is_use='Y'
+				 order by       pr.order_index asc
+		</select>
+	
+		<!-- 查询首页众筹项目（3条） -->
+		<select id="selectCrowdfundingProjectLists"  resultMap="crowdfundingprojectlist" >
+			select          pc.pi_id,
+							pi.project_name,
+							pi.project_cover_url,
+							pi.project_log_nums,
+							pi.project_comm_nums,
+							u.user_nick ,
+							pi.project_desc_original	, 
+							pi.project_desc    ,
+							pi.project_desc_background   ,
+							pi.project_update_episode ,
+							pi.project_total_episode , 
+							pi.crowdfunding_project_cover_url, 
+							pc.order_index
+							
+			  from      	p_project_crowdfunding pc
+		 left join 	        p_project_info pi
+                on        	pc.pi_id =pi.pi_id
+      	 left join          u_user_info u
+                on 			pi.project_owner_account =u.account
+         left join  			p_project_movie_rel   pmr 
+         		on  			pc.pi_id = pmr.pi_id    
+         						and pmr.episode_no = 1 
+         left  join 			m_movie_info mi  
+					on  			pmr.m_id = mi.m_id 			
+         
+             where          pc.is_use ='Y'    and   pi.is_use = 'Y'   
+             					
+            order by       pc.order_index asc, pc.date_time desc
+		   
+		</select>
+	
+		<!-- updateProjectInBoutique 推荐位修改标记位 -->	
+		<update id="updateProjectInBoutique" parameterClass="java.util.Map">
+			update 		p_project_recommend  
+			set 		is_use = 'N' 
+			where 		pi_id = #piId#
+		</update>
+		
+		<!-- selectAllProjectInfo  查询所有项目信息（排除推荐位） -->
+		<select id="selectAllProjectInfo" resultMap="projectInfoResult">
+			select  pi.pi_id 		, 		pi.project_name     
+					from p_project_info pi 
+					where  pi.pi_id not in (	select  	pr.pi_id
+															from p_project_recommend  pr
+															where pr.is_Use = 'Y')  
+		</select>
+		
+		<!-- insertProjectIntoBoutique 添加项目进推荐表 -->
+		<insert id="insertProjectIntoBoutique" parameterClass="java.util.Map">
+				insert 			into 			p_project_recommend     
+						(  				pi_id        ,  					is_use   , order_index   )   
+						values 
+						( 				#piId#         , 					'Y'   ,     #orderIndex# )
+		</insert>
+		
+		<!-- updateProjectInBoutiqueToStricky -->
+		<update id="updateProjectInBoutiqueToStricky" parameterClass="java.util.Map">
+			update 		p_project_recommend  
+			set 		is_use = 'Y' , order_index=#orderIndex# 
+			where 		pi_id = #piId#
+		</update>
+		
+		<!-- selectProjectInRecommend -->
+		<select id="selectProjectInRecommend" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 		pr.r_id  rId		,  		pr.pi_id  piId		, pr.is_use  isUse  , pr.order_index  orderIndex
+			from 		p_project_recommend pr 
+			where 		pr.pi_id = #piId#
+		</select>
+		
+		<!-- updateProjectInCrowdfunding   -->
+		<update id="updateProjectInCrowdfunding" parameterClass="java.util.Map">
+			update 		p_project_crowdfunding  
+			set 		is_use = 'N'  
+			where 		pi_id = #piId#
+		</update>
+		
+		<!-- queryAllProjectOutOfCrowdfunding -->
+		<select id="queryAllProjectOutOfCrowdfunding" resultMap="projectInfoResult">
+			select  pi.pi_id 		, 		pi.project_name     
+					from p_project_info pi 
+					where  pi.pi_id not in (	select  	pc.pi_id
+															from p_project_crowdfunding  pc
+															where pc.is_Use = 'Y') 
+		</select>
+		<!-- selectProjectInCrowdfunding -->
+		<select id="selectProjectInCrowdfunding" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 		pc.pcf_id  pcfId 	,  	pc.pi_id  piId  ,  pc.is_use  isUse
+			from 		p_project_crowdfunding  pc 
+			where 		pc.pi_id = #piId#
+		</select>
+		
+		<!-- insertProjectIntoBoutique -->
+		<insert id="insertProjectIntoCrowdfunding" parameterClass="java.util.Map">
+				insert 			into 			p_project_crowdfunding     
+						(  				pi_id        ,  order_index	,		is_use    ,      date_time )   
+						values 
+						( 				#piId#         , 	#txIndex#  ,	'Y'    ,       #dateTime# )
+		</insert>
+		
+		<!-- updateProjectToCrowdfunding -->
+		<update id="updateProjectToCrowdfunding" parameterClass="java.util.Map">
+			update 		p_project_crowdfunding  
+			set 		is_use = 'Y' ,order_index=#txIndex#  ,  date_time = now()
+			where 		pi_id = #piId#
+		</update>
+		
+		<insert id="insertHomePage" parameterClass="com.fq.dao.entity.po.HomePagePO">
+			insert into sp_homepage
+				( m_id , title , is_use , write_date 	)
+			values
+				( #mId# , #title# , #isUse# , now()		)		
+		</insert>
+		
+		<select id="selectStartPage" resultClass="com.fq.dao.entity.vo.StartPageVO">
+			select sp.sp_id spId , sp.img_qiniukey imgQiniuKey  , sp.update_date updateDate  , sp.is_deleted  isDeleted ,
+			sp.create_date createDate
+			from c_start_page  sp 
+			where sp.is_deleted= 'N'
+		</select>
+		
+		<insert id="doAddStartPage" parameterClass="java.util.Map" >
+			insert into c_start_page (img_qiniukey,update_date,is_deleted ,create_date ) 
+							values	 (#imgQiniukey# , #updateDate# , #isUse# , #createDate#)
+			<selectKey resultClass="int" keyProperty="spId">
+				<![CDATA[SELECT LAST_INSERT_ID() AS spId ]]>
+			</selectKey>
+		</insert>
+		
+		<delete id="deleteStartPage" parameterClass="java.util.Map">
+			update 
+			c_start_page  sp
+			set sp.is_deleted = 'Y'
+			where sp_id = #spId#
+		</delete>
+		
+		<update id="updateStartPage" parameterClass="java.util.Map">
+			update c_start_page set img_qiniukey = #imgQiniukey# , update_date = #updateDate# , is_deleted = #isDeleted#
+			where sp_id = #spId#
+		</update>
+		<!-- 更新众凑项目排序 -->
+		<update id="updateCrowdfundingProjectListOrder" parameterClass="java.util.Map">
+			update p_project_crowdfunding ppcf set ppcf.order_index=#index# 
+			where ppcf.pi_id=#piId#
+		</update>
+		
+		<!-- 更新推荐模块排序 -->
+		<update id="updateBoutiqueProjectListOrder" parameterClass="java.util.Map">
+			update p_project_recommend ppr set ppr.order_index=#index# 
+			where ppr.pi_id=#piId#
+		</update>
+		<!--新增启动页  -->
+		<insert id="insertStartPage" parameterClass="java.util.Map" >
+			insert into c_start_page 
+			( img_qiniukey , update_date , is_deleted , create_date ) 
+			values	 
+			( #imgQiniukey# , #updateDate# , #isDeleted# , #createDate#)
+		</insert>
+		
+		<update id="toUpdateStartPage" parameterClass="java.util.Map">
+			update c_start_page sp  
+			set sp.is_deleted = 'Y'
+		</update>
+		<!-- 用户作品昨日统计数据查询 -->
+		<select id="selectUserProductDayCount" parameterClass="java.lang.Integer" resultClass="java.util.HashMap">
+			select t.userName userName , sum(t.readingNum) readingNum , format(sum(t.income) , 2 )  income   from (
+				select
+				a.user_name userName  , sum(r.reading_num) readingNum , sum(r.jpoint)/100 income 
+				from r_third_novel_ratio_income_report  r 
+				left  join bp_novel_admin na on na.ni_id = r.ni_id 
+				left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id =  #adminId# and date_sub( curdate(), interval 1 day ) = r.create_date 
+				union all 
+				select 
+				a.user_name userName , sum(r.reading_num  ) readingNum , sum(r.jpoint)/100  income 
+				from  r_third_cartoon_ratio_income_report r 
+				left join plc_live_cartoon plc on plc.plc_id = r.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+				left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id =  #adminId# and date_sub( curdate(), interval 1 day ) = r.create_date  
+			)t 
+		</select>
+		
+		<!-- 用户作品统计总数据查询 -->
+		<select id="selectUserProductTotalCount" parameterClass="java.lang.Integer" resultClass="java.util.HashMap">
+			select t.userName userName , sum(t.readingNum) readingNum   from (
+				select
+				a.user_name userName  , sum(r.reading_num) readingNum 
+				from r_third_party_novel_income_report r 
+				left  join bp_novel_admin na on na.ni_id = r.ni_id 
+				left join bp_admin a on a.a_id = na.a_id 
+				where a.a_id = #adminId# and <![CDATA[ date_sub( curdate(), interval 1 day ) >= r.create_dt  ]]>
+				union all 
+				select 
+				a.user_name userName , sum( cir.reading_num ) readingNum 
+				from r_third_party_cartoon_income_report cir 
+				left join plc_live_cartoon plc on plc.plc_id = cir.plc_id 
+				left join bp_project_admin pa on pa.pi_id = plc.pi_id
+				left join bp_admin a  on a.a_id = pa.a_id 
+				where a.a_id = #adminId# and <![CDATA[ date_sub( curdate(), interval 1 day ) >= cir.create_dt  ]]>
+			)t 
+		</select>
+		
+		<!-- 用户最新作品数据统计 -->
+		<select id="selectUserNewProductInfo" parameterClass="java.lang.Integer" resultClass="java.util.HashMap">
+			select t.id id   , t.createDate createDate , t.name name  , t.updateNum updateNum , t.coverImg coverImg , t.subType subType  from (
+				(select 
+				 ni.ni_id id ,    ni.create_dt   createDate , ni.novel_name name , ni.current_chapter_num updateNum  , ni.novel_cover_img coverImg  , 'novel' subType
+				from n_novel_info ni 
+				left join bp_novel_admin na on na.ni_id = ni.ni_id  
+				left join bp_admin a on a.a_id = na.a_id
+				where a.a_id = #adminId#
+				order by ni.create_dt desc , ni.create_tm desc  , ni.ni_id desc 
+				limit 1  )
+				union all 
+				(select 
+				plc.plc_id id ,  pi.create_date createDate , plc.cartoon_title name , plc.current_episode updateNum , plc.cartoon_cover_url coverImg , 'cartoon' subType
+				from plc_live_cartoon plc 
+				left join p_project_info pi on pi.pi_id = plc.pi_id 
+				left join bp_project_admin pa on pa.pi_id = pi.pi_id
+				left join bp_admin a on a.a_id = pa.a_id 
+				where a.a_id = #adminId# 
+				order by pi.create_date desc  , pi.plc_id desc 
+				limit 1 )
+			)t 
+			order by createDate desc  , id desc 
+			limit 1
+		</select>
+		<!-- 用户最新小说作品详细信息 -->
+		<select id="selectUserNewNovelProductDetailInfo" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 
+			sum(nc.chapter_words ) totalWordsOrPages  ,  date_format(ni.update_dt  , '%Y-%m-%d ' ) updateDt  , 
+			case 
+			when ni.add_state = '1' then '已发布'
+			when ni.add_state != '1' then '未发布' 
+			end  addState 
+			from  n_novel_chapter nc 
+			left join n_novel_info ni on ni.ni_id = nc.ni_id 
+			where ni.ni_id = #id#  
+		</select>		
+		<!-- 用户最新漫画作品详细信息 -->
+		<select id="selectUserNewCartoonProductDetailInfo" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 
+			count(1) totalWordsOrPages ,  max(lcc.create_dt) updateDt , 
+			case 
+			when plc.current_episode =  0 then '未发布'
+			when plc.current_episode != 0 then '已发布'
+			end addState  
+			from plc_live_cartoon_page lcp 
+			left join  plc_live_cartoon_chapter lcc  on lcc.lc_id = lcp.lc_id 
+			left join plc_live_cartoon plc on plc.plc_id = lcc.plc_id 
+			where plc.plc_id = #id#  and lcc.is_updated = 'Y' and lcc.is_deleted = 'N'  and lcp.is_deleted = 'N';
+		</select>
+		<!-- 用户最新漫画作品统计数据 -->
+		<select id="selectUserNewCartoonProductCount" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 
+			sum(r.reading_num ) readingNum , truncate(sum(r.jpoint)/100 , 2) income 
+			from r_third_cartoon_ratio_income_report r 
+			where r.plc_id = #id# and <![CDATA[ date_sub( curdate(), interval 1 day ) >= r.create_date ]]>
+		</select>
+		<!-- 用户最新小说作品统计数据 -->
+		<select id="selectUserNewNovelProductCount" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+			select 
+			sum(r.reading_num) readingNum , truncate(sum(r.jpoint)/100 , 2)  income 
+			from r_third_novel_ratio_income_report r 
+			where r.ni_id = #id# and <![CDATA[ date_sub( curdate(), interval 1 day ) >= r.create_date ]]>
+		</select>
+		
+		<!-- 三方用户信息统计 -->
+		<select id="selectThirdUserInfo" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+			select 
+			a.real_name realName , a.head_img_url imgUrl 
+			from bp_admin a 
+			where a.a_id = #adminId# 
+		</select>
+		
+		<select id="shake" resultClass="java.lang.Integer">
+			select 1
+		</select>	
+		
+				
+</sqlMap>
