@@ -1,6 +1,0 @@
-projectKey=jnwtv-message
-serverUrl=http://192.168.1.110:10087/sonar
-serverVersion=6.4.0.25310
-dashboardUrl=http://192.168.1.110:10087/sonar/dashboard/index/jnwtv-message
-ceTaskId=AV0WkogW5Mos3oxuMmMl
-ceTaskUrl=http://192.168.1.110:10087/sonar/api/ce/task?id=AV0WkogW5Mos3oxuMmMl
