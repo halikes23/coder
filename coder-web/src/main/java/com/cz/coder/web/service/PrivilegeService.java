@@ -1,4 +1,4 @@
-package com.fq.service;
+package com.cz.coder.web.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,28 +11,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cz.coder.web.dao.dao.privilege.PrivilegeDAO;
+import com.cz.coder.web.dao.entity.po.AdminPO;
+import com.cz.coder.web.dao.entity.po.RolePO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminRolesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListRolePrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.RoleVO;
+import com.cz.coder.web.form.privilege.AddAdminForm;
+import com.cz.coder.web.form.privilege.AddRoleForm;
+import com.cz.coder.web.form.privilege.SaveAdminForm;
+import com.cz.coder.web.form.privilege.SaveAdminRolesForm;
+import com.cz.coder.web.form.privilege.SaveRoleForm;
+import com.cz.coder.web.form.privilege.SaveRolePrivilegesForm;
+import com.cz.coder.web.util.page.PageInfo;
+import com.cz.coder.web.util.page.PageUtil;
 import com.fq.common.constant.RetCode;
-import com.fq.dao.dao.privilege.PrivilegeDAO;
-import com.fq.dao.entity.po.AdminPO;
-import com.fq.dao.entity.po.RolePO;
-import com.fq.dao.entity.vo.OperateLog;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO;
-import com.fq.dao.entity.vo.privilege.ListAdminRolesVO;
-import com.fq.dao.entity.vo.privilege.ListRolePrivilegesVO;
-import com.fq.dao.entity.vo.privilege.RoleVO;
-import com.fq.dao.entity.vo.project.PurviewProjectInfo;
-import com.fq.form.privilege.AddAdminForm;
-import com.fq.form.privilege.AddRoleForm;
-import com.fq.form.privilege.SaveAdminForm;
-import com.fq.form.privilege.SaveAdminProjectPrivilegeForm;
-import com.fq.form.privilege.SaveAdminRolesForm;
-import com.fq.form.privilege.SaveRoleForm;
-import com.fq.form.privilege.SaveRolePrivilegesForm;
 import com.fq.util.JnwtvStringUtils;
 import com.fq.util.MD5Util;
-import com.fq.util.page.PageInfo;
-import com.fq.util.page.PageUtil;
 
 
 /**
@@ -278,67 +275,5 @@ public class PrivilegeService {
 		}
 	}
 
-	/**
-	 * 查询所有项目信息
-	 * @return
-	 */
-	public List<PurviewProjectInfo> queryAllPurviewProjectInfo(Integer adminId) throws Exception {
-		try {
-			//查出具有该用户具有的项目权限
-			List<PurviewProjectInfo> purviewProjectList =  privilegeDAO.queryAllPurviewProjectInfo(adminId);
-			
-			//查出所有项目
-			List<PurviewProjectInfo> projectList = privilegeDAO.queryAllProjectInfo();
-			
-			if( purviewProjectList == null || purviewProjectList.size() == 0 ){
-				for(PurviewProjectInfo projectInfoVO : projectList){
-					projectInfoVO.setChecked(false);
-				}
-				return projectList;
-			}
-
-			A:for (PurviewProjectInfo projectInfo : projectList) {
-				for (PurviewProjectInfo purviewProjectInfo : purviewProjectList) {
-					if( purviewProjectInfo.getPiId().equals(projectInfo.getPiId()) ){
-						projectInfo.setChecked(true);
-						continue A;
-					}else{
-						projectInfo.setChecked(false);
-					}
-				}
-			}
-			
-			return projectList;
-		} catch (Exception e) {
-			logger.error("错误日志:", e);
-			throw e ;
-		}
-	}
-
-	/**
-	 * 保存用户查看项目权限
-	 * @param form
-	 * @return
-	 */
-	public String doSaveAdminProjectPrivilege(SaveAdminProjectPrivilegeForm form) {
-		try {
-			
-			privilegeDAO.deleteAdminProjectPrivilege(form.getAdminId());
-			
-			if( "".equals(form.getPiIds()) ){
-				return RetCode.SUCCESS;
-			}
-			privilegeDAO.insertAdminProjectPrivilege(form);
-			
-			return RetCode.SUCCESS;
-		} catch (Exception e) {
-			logger.error("错误日志:", e);
-			throw e ;
-		}
-	}
-
-	public OperateLog getLogParams(Integer logId) {
-		return this.privilegeDAO.queryLogInfoByLogId(logId);
-	}
 
 }

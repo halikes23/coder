@@ -1,4 +1,4 @@
-package com.fq.util;
+package com.cz.coder.web.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

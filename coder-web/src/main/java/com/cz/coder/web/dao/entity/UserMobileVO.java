@@ -1,4 +1,4 @@
-package com.fq.dao.entity;
+package com.cz.coder.web.dao.entity;
 
 public class UserMobileVO {
 	private String clientType ;

@@ -1,24 +1,13 @@
-package com.fq.util;
+package com.cz.coder.web.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
-import com.fq.constant.ThirdConsoleConstant;
 
 /**
  * csv工具类
@@ -82,37 +71,6 @@ public class CSVUtil {
 				writer.close();
 			}
 		}
-	}
-	/**
-	 * 
-	 * @Title: readerCSV 
-	 * @author jingkun.chen cjk_jing@163.com
-	 * @Description: 读取csv文件
-	 * @param @return
-	 * @param @throws Exception    设定文件  
-	 * @return Set<String>    返回类型
-	 */
-	public static List<String> readerCSV() throws Exception {
-		try {
-			CsvReader csvReader = new CsvReader(  ThirdConsoleConstant.CFG_BASE_PATH + "nick.csv" ,  ',' , Charset.forName("GBK")) ; 
-			csvReader.readHeaders() ;
-			List<String> nameList = new ArrayList<String>() ; 
-			while(csvReader.readRecord()){
-//				System.out.println(csvReader.getRaswRecord());
-				nameList.add( csvReader.getRawRecord() ) ; 
-			}
-			logger.info("本次添加备选昵称量："+nameList.size() ) ; 
-			return nameList ;
-			
-		} catch (Exception e) {
-			logger.info("csv读取异常", e )  ;
-			throw e ; 
-		}
-		
-	 
-	}
-	public static void main(String[] args) throws Exception {
-		readerCSV() ; 
 	}
 
 }

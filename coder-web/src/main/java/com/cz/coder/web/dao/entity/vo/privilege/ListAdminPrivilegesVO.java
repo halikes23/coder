@@ -1,4 +1,4 @@
-package com.fq.dao.entity.vo.privilege;
+package com.cz.coder.web.dao.entity.vo.privilege;
 
 public class ListAdminPrivilegesVO {
 	

@@ -1,4 +1,4 @@
-package com.fq.filter;
+package com.cz.coder.web.filter;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -19,8 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.fq.service.LoginService;
-import com.fq.service.UserService;
+import com.cz.coder.web.service.LoginService;
 
 import net.sf.json.JSONObject;
 
@@ -35,7 +34,6 @@ public class AdminCheckFilter implements Filter {
 	/** * 不通过时转发的url */
 	private String forwardUrl;
 
-	private UserService userService;
 	
 	private LoginService loginService ;
 	
@@ -49,7 +47,6 @@ public class AdminCheckFilter implements Filter {
 		ServletContext context = cfg.getServletContext();
 		ApplicationContext ac = WebApplicationContextUtils
 				.getWebApplicationContext(context);
-		userService = (UserService) ac.getBean("userService");
 		loginService = (LoginService) ac.getBean("loginService") ;
 
 		logger.info("1");
@@ -115,8 +112,6 @@ public class AdminCheckFilter implements Filter {
 			jsonRequest = buildJsonRequest(req, request,
 					response, servletPath, sessionObj, method);
 			
-			userService.insertOperateLog(jsonRequest);
-
 			logger.info(String.valueOf(jsonRequest));
 
 		} catch (Exception e) {

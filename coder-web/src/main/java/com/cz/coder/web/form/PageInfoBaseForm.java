@@ -1,4 +1,4 @@
-package com.fq.form;
+package com.cz.coder.web.form;
 
 /**
  * 分页基础表单

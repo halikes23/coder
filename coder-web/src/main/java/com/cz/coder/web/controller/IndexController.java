@@ -1,16 +1,14 @@
-package com.fq.controller;
+package com.cz.coder.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fq.properties.GlobalProperties;
-import com.fq.service.PropertiesService;
+import com.cz.coder.web.properties.GlobalProperties;
 
 
 /**
@@ -20,9 +18,6 @@ import com.fq.service.PropertiesService;
  */
 @Controller
 public class IndexController {
-	
-	@Autowired
-	private PropertiesService propertisService ;
 	
 	@RequestMapping(value="index")
 	public ModelAndView index () {
@@ -49,12 +44,6 @@ public class IndexController {
 	@RequestMapping(value="homepage")
 	public ModelAndView homePage(){
 		Map<String, Object> model = new HashMap<String, Object>();
-		if( StringUtils.equals(GlobalProperties.IS_DEBUG, "1") ){
-			model.put("dbUrl", propertisService.getDbUrl());
-		}else{
-			model.put("dbUrl", "***************************************");
-		}
-		
 		
 		return new ModelAndView( "/index/homePage",model);
 	}

@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-package com.fq.util;
+package com.cz.coder.web.util;
 
 import com.qiniu.util.Json;
 import com.qiniu.util.StringMap;

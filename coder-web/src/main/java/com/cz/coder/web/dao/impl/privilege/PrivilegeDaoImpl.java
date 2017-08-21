@@ -1,4 +1,4 @@
-package com.fq.dao.impl.privilege;
+package com.cz.coder.web.dao.impl.privilege;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -8,18 +8,15 @@ import java.util.Map;
 import org.springframework.orm.ibatis.SqlMapClientCallback;
 import org.springframework.stereotype.Repository;
 
+import com.cz.coder.web.dao.dao.privilege.PrivilegeDAO;
+import com.cz.coder.web.dao.entity.po.AdminPO;
+import com.cz.coder.web.dao.entity.po.RolePO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminRolesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListRolePrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.RoleVO;
 import com.fq.dao.BaseDAO;
-import com.fq.dao.dao.privilege.PrivilegeDAO;
-import com.fq.dao.entity.po.AdminPO;
-import com.fq.dao.entity.po.RolePO;
-import com.fq.dao.entity.vo.OperateLog;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO;
-import com.fq.dao.entity.vo.privilege.ListAdminRolesVO;
-import com.fq.dao.entity.vo.privilege.ListRolePrivilegesVO;
-import com.fq.dao.entity.vo.privilege.RoleVO;
-import com.fq.dao.entity.vo.project.PurviewProjectInfo;
-import com.fq.form.privilege.SaveAdminProjectPrivilegeForm;
 import com.fq.util.JnwtvStringUtils;
 import com.ibatis.sqlmap.client.SqlMapExecutor;
 
@@ -194,52 +191,10 @@ public class PrivilegeDaoImpl extends BaseDAO implements PrivilegeDAO {
 		return (Integer) getSqlMapClientTemplate().queryForObject("PrivilegeDaoImpl.selectUserRecordTotals",paramMap);
 	}
 
-	@Override
-	public List<PurviewProjectInfo> queryAllPurviewProjectInfo(Integer adminId) {
-		return getSqlMapClientTemplate().queryForList("PrivilegeDaoImpl.selectAllPurviewProjectInfo",adminId);
-	}
-
-	@Override
-	public List<PurviewProjectInfo> queryAllProjectInfo() {
-		return getSqlMapClientTemplate().queryForList("PrivilegeDaoImpl.selectAllProjectInfo");
-	}
 
 	@Override
 	public void deleteAdminProjectPrivilege(Integer adminId) {
 		getSqlMapClientTemplate().delete("PrivilegeDaoImpl.deleteAdminProjectPrivilege",adminId);
 	}
 
-	@Override
-	public void insertAdminProjectPrivilege(final SaveAdminProjectPrivilegeForm form) {
-		getSqlMapClientTemplate().execute( new SqlMapClientCallback<Integer>() {
-
-			@Override
-			public Integer doInSqlMapClient(SqlMapExecutor executor)
-					throws SQLException {
-				
-				executor.startBatch();
-				
-				String[] piIds = form.getPiIds().split(",");
-				
-				for (int i = 0; i < piIds.length; i++) {
-					Map<String , Object> param = new HashMap<>();
-					param.put("aId", form.getAdminId());
-					param.put("piId", piIds[i]);
-					
-					executor.insert("PrivilegeDaoImpl.insertAdminProjectPrivilege" , param);
-				}
-				
-				executor.executeBatch();
-				
-				return null;
-			}
-		
-		});
-	}
-
-	@Override
-	public OperateLog queryLogInfoByLogId(Integer logId) {
-		return (OperateLog)this.getSqlMapClientTemplate().queryForObject("PrivilegeDaoImpl.queryLogInfoByLogId",logId);
-	}
-	
 }

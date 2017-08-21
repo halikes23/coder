@@ -1,11 +1,10 @@
-package com.fq.dao.dao;
+package com.cz.coder.web.dao.dao;
 
 import java.util.Map;
 
-import com.fq.dao.entity.po.LoginPO;
-import com.fq.dao.entity.vo.LoginVO;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.form.login.LoginCheckForm;
+import com.cz.coder.web.dao.entity.vo.LoginVO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.form.login.LoginCheckForm;
 
 /**
  * 

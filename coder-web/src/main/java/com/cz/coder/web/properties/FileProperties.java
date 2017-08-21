@@ -1,9 +1,9 @@
-package com.fq.properties;
+package com.cz.coder.web.properties;
 
 import java.io.File;
 import java.util.Properties;
 
-import com.fq.constant.ThirdConsoleConstant;
+import com.cz.coder.web.constant.ThirdConsoleConstant;
 import com.fq.util.ConfigUtil;
 
 /**

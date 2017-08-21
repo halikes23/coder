@@ -1,4 +1,4 @@
-package com.fq.dao.entity.po;
+package com.cz.coder.web.dao.entity.po;
 /**
  * 
  * @ClassName AdminPO  

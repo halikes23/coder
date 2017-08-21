@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ThirdConsoleConstant {
+public class ThirdConsoleConstant { 
 	
 	public final static String KEY_CREATE_DATE = "createDate";
 	

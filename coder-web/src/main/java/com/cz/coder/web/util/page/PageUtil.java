@@ -1,4 +1,4 @@
-package com.fq.util.page;
+package com.cz.coder.web.util.page;
 
 import java.util.HashMap;
 import java.util.Map;

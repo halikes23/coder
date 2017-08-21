@@ -1,4 +1,4 @@
-package com.fq.service;
+package com.cz.coder.web.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

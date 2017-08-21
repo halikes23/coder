@@ -1,4 +1,4 @@
-package com.fq.form.login;
+package com.cz.coder.web.form.login;
 
 /**
  * 修改密码表单

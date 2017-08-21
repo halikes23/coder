@@ -1,18 +1,15 @@
-package com.fq.dao.dao.privilege;
+package com.cz.coder.web.dao.dao.privilege;
 
 import java.util.List;
 import java.util.Map;
 
-import com.fq.dao.entity.po.AdminPO;
-import com.fq.dao.entity.po.RolePO;
-import com.fq.dao.entity.vo.OperateLog;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO;
-import com.fq.dao.entity.vo.privilege.ListAdminRolesVO;
-import com.fq.dao.entity.vo.privilege.ListRolePrivilegesVO;
-import com.fq.dao.entity.vo.privilege.RoleVO;
-import com.fq.dao.entity.vo.project.PurviewProjectInfo;
-import com.fq.form.privilege.SaveAdminProjectPrivilegeForm;
+import com.cz.coder.web.dao.entity.po.AdminPO;
+import com.cz.coder.web.dao.entity.po.RolePO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminRolesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListRolePrivilegesVO;
+import com.cz.coder.web.dao.entity.vo.privilege.RoleVO;
 
 public interface PrivilegeDAO {
 
@@ -56,14 +53,6 @@ public interface PrivilegeDAO {
 
 	Integer queryUserRecordTotals(Map<String, Object> paramMap);
 
-	List<PurviewProjectInfo> queryAllPurviewProjectInfo(Integer adminId);
-
-	List<PurviewProjectInfo> queryAllProjectInfo();
-
 	void deleteAdminProjectPrivilege(Integer adminId);
-
-	void insertAdminProjectPrivilege(SaveAdminProjectPrivilegeForm form);
-
-	OperateLog queryLogInfoByLogId(Integer logId);
 
 }

@@ -1,4 +1,4 @@
-package com.fq.form.privilege;
+package com.cz.coder.web.form.privilege;
 
 /**
  * 后台用户权限参数表

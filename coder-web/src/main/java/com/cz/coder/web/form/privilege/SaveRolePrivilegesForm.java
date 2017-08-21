@@ -1,4 +1,4 @@
-package com.fq.form.privilege;
+package com.cz.coder.web.form.privilege;
 
 public class SaveRolePrivilegesForm {
 

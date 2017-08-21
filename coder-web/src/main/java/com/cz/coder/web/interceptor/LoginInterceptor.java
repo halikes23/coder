@@ -1,4 +1,4 @@
-package com.fq.interceptor;
+package com.cz.coder.web.interceptor;
 
 
 
@@ -13,8 +13,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fq.auth.LoginAuth;
-import com.fq.form.login.LoginCheckForm;
+import com.cz.coder.web.auth.LoginAuth;
+import com.cz.coder.web.form.login.LoginCheckForm;
 
 
 public class LoginInterceptor implements HandlerInterceptor {

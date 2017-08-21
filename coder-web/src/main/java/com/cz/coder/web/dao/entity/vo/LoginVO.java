@@ -1,4 +1,4 @@
-package com.fq.dao.entity.vo;
+package com.cz.coder.web.dao.entity.vo;
 
 /**
  * 

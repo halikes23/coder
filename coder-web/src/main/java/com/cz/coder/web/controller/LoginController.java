@@ -1,4 +1,4 @@
-package com.fq.controller;
+package com.cz.coder.web.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,18 +18,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
-
-import com.fq.common.constant.RedisConstant;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO;
+import com.cz.coder.web.exception.BusinessException;
+import com.cz.coder.web.form.login.ChgPsdForm;
+import com.cz.coder.web.form.login.LoginCheckForm;
+import com.cz.coder.web.properties.GlobalProperties;
+import com.cz.coder.web.service.LoginService;
+import com.cz.coder.web.service.PrivilegeService;
+import com.cz.coder.web.util.BeanUtil;
 import com.fq.common.constant.RetCode;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO;
-import com.fq.exception.BusinessException;
-import com.fq.form.login.ChgPsdForm;
-import com.fq.form.login.LoginCheckForm;
-import com.fq.properties.GlobalProperties;
-import com.fq.service.LoginService;
-import com.fq.service.PrivilegeService;
-import com.fq.util.BeanUtil;
 import com.fq.util.JnwtvStringUtils;
 import com.fq.util.MD5Util;
 

@@ -1,4 +1,4 @@
-package com.fq.exception;
+package com.cz.coder.web.exception;
 
 /**
  * 业务异常

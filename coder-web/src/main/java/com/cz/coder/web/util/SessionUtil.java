@@ -1,8 +1,8 @@
-package com.fq.util;
+package com.cz.coder.web.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.fq.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
 
 public class SessionUtil {
 

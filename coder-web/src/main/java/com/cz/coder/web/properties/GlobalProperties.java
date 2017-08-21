@@ -1,17 +1,9 @@
-package com.fq.properties;
+package com.cz.coder.web.properties;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.fq.constant.ThirdConsoleConstant;
-import com.fq.dao.entity.po.ServerPO;
+import com.cz.coder.web.constant.ThirdConsoleConstant;
 import com.fq.util.ConfigUtil;
-import com.pingplusplus.Pingpp;
 
 public class GlobalProperties {
 

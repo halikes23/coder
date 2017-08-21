@@ -1,4 +1,4 @@
-package com.fq.util;
+package com.cz.coder.web.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

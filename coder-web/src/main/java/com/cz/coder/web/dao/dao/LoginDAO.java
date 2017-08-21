@@ -1,10 +1,9 @@
-package com.fq.dao.dao;
+package com.cz.coder.web.dao.dao;
 
 import java.util.Map;
 
-import com.fq.dao.entity.po.MobileCodePO;
-import com.fq.dao.entity.vo.MobileCodeVO;
-import com.fq.form.login.LoginCheckForm;
+import com.cz.coder.web.dao.entity.po.MobileCodePO;
+import com.cz.coder.web.dao.entity.vo.MobileCodeVO;
 
 /**
  * 

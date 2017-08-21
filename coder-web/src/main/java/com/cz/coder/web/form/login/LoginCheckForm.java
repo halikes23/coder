@@ -1,4 +1,4 @@
-package com.fq.form.login;
+package com.cz.coder.web.form.login;
 
 public class LoginCheckForm {
 

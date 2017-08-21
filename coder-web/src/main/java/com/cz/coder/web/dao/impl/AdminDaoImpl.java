@@ -1,14 +1,14 @@
-package com.fq.dao.impl;
+package com.cz.coder.web.dao.impl;
 
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.cz.coder.web.dao.dao.AdminDAO;
+import com.cz.coder.web.dao.entity.vo.LoginVO;
+import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
+import com.cz.coder.web.form.login.LoginCheckForm;
 import com.fq.dao.BaseDAO;
-import com.fq.dao.dao.AdminDAO;
-import com.fq.dao.entity.vo.LoginVO;
-import com.fq.dao.entity.vo.privilege.AdminVO;
-import com.fq.form.login.LoginCheckForm;
 
 /**
  * 

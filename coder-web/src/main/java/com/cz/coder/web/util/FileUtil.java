@@ -1,4 +1,4 @@
-package com.fq.util;
+package com.cz.coder.web.util;
 
 import com.sun.star.lang.IllegalArgumentException;
 /**
