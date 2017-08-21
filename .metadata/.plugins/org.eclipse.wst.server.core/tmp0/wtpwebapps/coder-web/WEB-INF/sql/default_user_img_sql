@@ -1,2 +1,0 @@
-
-insert into c_img values( -1 , null , now() , 'http://192.168.1.12:8080/reha/reha_head_imgs/default.png' , -1 ) ;

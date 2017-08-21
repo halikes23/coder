@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;jnwtv-third-console&apos; to &apos;coder-web&apos;" description="Rename resource &apos;jnwtv-third-console&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/jnwtv-third-console" name="coder-web" stamp="1503286299710" updateReferences="true"/>
-</session>
