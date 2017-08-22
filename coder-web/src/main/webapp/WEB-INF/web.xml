@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_1496299349370" version="2.5">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:web="http://java.sun.com/xml/ns/javaee" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
+	id="WebApp_1496299349370" version="2.5">
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/classes/context/spring-cotext.xml</param-value>
+    <param-value>/WEB-INF/classes/context/spring-context.xml</param-value>
   </context-param>
   <context-param>
     <param-name>webAppRootKey</param-name>
-    <param-value>jnwtv-third-console</param-value>
+    <param-value>code-web</param-value>
   </context-param>
   <listener>
     <listener-class>
@@ -15,7 +19,7 @@
   </listener>
   <context-param>
     <param-name>logbackConfigLocation</param-name>
-    <param-value>file:/data/cz/coder/resource/web/logback.coder-web.xml</param-value>
+    <param-value>file:/data/cz/coder/resource/web/logback.web.xml</param-value>
   </context-param>
   <listener>
     <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
@@ -60,7 +64,7 @@
   </filter-mapping>
   <filter>
     <filter-name>HtmlFilter</filter-name>
-    <filter-class>com.fq.filter.HtmlFilter</filter-class>
+    <filter-class>com.cz.coder.web.web.filter.HtmlFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>HtmlFilter</filter-name>
@@ -68,7 +72,7 @@
   </filter-mapping>
   <filter>
     <filter-name>adminCheckFilter</filter-name>
-    <filter-class>com.fq.filter.AdminCheckFilter</filter-class>
+    <filter-class>com.cz.coder.web.web.filter.AdminCheckFilter</filter-class>
     <init-param>
       <description>将当前登录的用户的信息保存在 session 中时使用的key，如果没有配置此参数，则该过滤器不起作用</description>
       <param-name>sessionKey</param-name>

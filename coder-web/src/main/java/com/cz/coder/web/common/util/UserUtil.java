@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import com.fq.util.pingpp.Main;
-
 public class UserUtil {
 
 	 
@@ -175,30 +173,6 @@ public class UserUtil {
 		return DateFormatUtil.timeStamp2Date( String.valueOf( time) , null ) ;
 	}
 
-	/**
-	 * 
-	 * @Title: getUserOpenId 
-	 * @author jingkun.chen cjk_jing@163.com
-	 * @Description: 随机生成定长的字符串序列
-	 * @param @param len
-	 * @param @return    设定文件  
-	 * @return String    返回类型
-	 */
-	public static String getUserOpenId(int len){
-		StringBuilder builder = new StringBuilder() ; 
-		while ( len > 0 ) {
-			if ( len > 20 ) {
-				builder.append( Main.randomString(20)  ) ; 
-				len -= 20 ; 
-			}else {
-				builder.append( Main.randomString(len)  ) ; 
-				len = 0 ; 
-			}
-			
-		}
-		return builder.toString() ; 
-		
-	}
 	public static int getUserRewward(){
 		List<Integer > rewardCouponList = Arrays.asList( rewardCoupon ) ; 
 		return rewardCouponList.get( (int)(Math.random()*rewardCouponList.size())) ; 

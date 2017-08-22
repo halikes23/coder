@@ -4,10 +4,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.cz.coder.common.dao.BaseDAO;
 import com.cz.coder.web.dao.dao.LoginDAO;
 import com.cz.coder.web.dao.entity.po.MobileCodePO;
 import com.cz.coder.web.dao.entity.vo.MobileCodeVO;
-import com.fq.dao.BaseDAO;
 
 /**
  * 

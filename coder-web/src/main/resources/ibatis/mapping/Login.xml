@@ -2,7 +2,7 @@
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap namespace="LoginDaoImpl" >
-	<resultMap id="mobileCodeResult" class="com.fq.dao.entity.vo.MobileCodeVO">
+	<resultMap id="mobileCodeResult" class="com.cz.coder.web.dao.entity.vo.MobileCodeVO">
 		<result property="userName" column="user_name"/>
 		<result property="userMobile" column="user_mobile"/>
 		<result property="mobileCode" column="mobile_code"/>
@@ -16,7 +16,7 @@
 					and 		timestampdiff( second,cmc.send_date,now() )  &lt; #validityOfMobileCode#
 	</select>
 	<!--insertMobileCode   -->
-	<insert id="insertMobileCode"  parameterClass="com.fq.dao.entity.po.MobileCodePO"  >
+	<insert id="insertMobileCode"  parameterClass="com.cz.coder.web.dao.entity.po.MobileCodePO"  >
 		insert 			into  			bp_console_login_mobile_code    
 						(     	user_name   ,   			user_mobile   ,    			mobile_code   ,  		send_date   )
 						values			

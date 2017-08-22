@@ -4,7 +4,7 @@
 <sqlMap namespace="PrivilegeDaoImpl">
 		
 	<!-- 查询操作员 -->
-	<select id="selectAdmin" parameterClass="java.util.Map" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+	<select id="selectAdmin" parameterClass="java.util.Map" resultClass="com.cz.coder.web.dao.entity.vo.privilege.AdminVO">
 		select  a.a_id adminId , a.user_name userName , a.real_name realName , a.phone adminPhone ,a.mail
 		from 	bp_admin a 
 		where is_use = '1'
@@ -15,14 +15,14 @@
 	</select>
 	
 	<!-- 查询操作员 -->
-	<select id="selectAdminByUserName" parameterClass="java.lang.String" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+	<select id="selectAdminByUserName" parameterClass="java.lang.String" resultClass="com.cz.coder.web.dao.entity.vo.privilege.AdminVO">
 		select  a.a_id adminId , a.user_name userName , a.real_name realName , a.phone adminPhone, a.mail
 		from 	bp_admin a 
 		where is_use = '1' and a.user_name = #userName#
 		
 	</select>
 	
-	<insert id="insertAdmin" parameterClass="com.fq.dao.entity.po.AdminPO">
+	<insert id="insertAdmin" parameterClass="com.cz.coder.web.dao.entity.po.AdminPO">
 		insert into bp_admin	( user_name  , real_name , pwd 		, phone 	, mail,is_use)
 		values				( #adminName#, #realName#, #pwd# , #adminPhone# ,#mail# ,1)
 	</insert>
@@ -31,11 +31,11 @@
 		update bp_admin set is_use = 0 where a_id = #adminId#
 	</update>
 	
-	<update id="updateAdmin" parameterClass="com.fq.dao.entity.po.AdminPO">
+	<update id="updateAdmin" parameterClass="com.cz.coder.web.dao.entity.po.AdminPO">
 		update bp_admin set real_name=#realName# , phone=#adminPhone# ,mail=#mail# where a_id = #aId#
 	</update>
 	
-	<select id="selectRolesWithAdmin" resultClass="com.fq.dao.entity.vo.privilege.ListAdminRolesVO" parameterClass="java.lang.Integer">
+	<select id="selectRolesWithAdmin" resultClass="com.cz.coder.web.dao.entity.vo.privilege.ListAdminRolesVO" parameterClass="java.lang.Integer">
 		select r.role_code roleCode , r.role_name roleName ,
 			case when rel.a_id is null then 'false' when rel.a_id is not null then 'true' end checked
 		from bp_role r
@@ -55,19 +55,19 @@
 	</insert>
 	
 	
-	<select id="selectRoles" resultClass="com.fq.dao.entity.vo.privilege.RoleVO" parameterClass="java.util.HashMap">
+	<select id="selectRoles" resultClass="com.cz.coder.web.dao.entity.vo.privilege.RoleVO" parameterClass="java.util.HashMap">
 		select r.role_code roleCode , r.role_name roleName 
 		from bp_role r
 		where role_stat = 'Y'
 	</select> 
 	
-	<select id="selectRoleByRoleName" resultClass="com.fq.dao.entity.vo.privilege.RoleVO" parameterClass="java.lang.String">
+	<select id="selectRoleByRoleName" resultClass="com.cz.coder.web.dao.entity.vo.privilege.RoleVO" parameterClass="java.lang.String">
 		select r.role_code roleCode , r.role_name roleName 
 		from bp_role r
 		where role_stat = 'Y' and role_name = #roleName#
 	</select>
 	
-	<insert id="insertRole" parameterClass="com.fq.dao.entity.po.RolePO">
+	<insert id="insertRole" parameterClass="com.cz.coder.web.dao.entity.po.RolePO">
 		insert into bp_role	( role_name , creator 	, cre_dt)
 		values				( #roleName#, #creator#	, now())
 	</insert>
@@ -80,7 +80,7 @@
 		delete from bp_admin_role_rel where role_code = #roleCode#
 	</delete>
 	
-	<select id="selectPrivilegesWithRole" resultClass="com.fq.dao.entity.vo.privilege.ListRolePrivilegesVO" parameterClass="java.lang.Integer">
+	<select id="selectPrivilegesWithRole" resultClass="com.cz.coder.web.dao.entity.vo.privilege.ListRolePrivilegesVO" parameterClass="java.lang.Integer">
 		select p.priv_code privCode , p.priv_name privName , p.parent_priv_code parentPrivCode ,
 			case when rel.role_code is null then 'false' when rel.role_code is not null then 'true' end checked
 		from bp_privilege p
@@ -88,7 +88,7 @@
 		order by p.order_index asc
 	</select> 
 	
-	<update id="updateRole" parameterClass="com.fq.dao.entity.po.RolePO">
+	<update id="updateRole" parameterClass="com.cz.coder.web.dao.entity.po.RolePO">
 		update bp_role r set r.role_name = #roleName# , r.modifier = #modifier# , mod_dt = now()
 		where role_code = #roleCode#
 	</update>
@@ -104,7 +104,7 @@
 			( #roleCode# , #privCode# , #creator# , now() )
 	</insert>
 	
-	<select id="selectAdminPriviletes" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.privilege.ListAdminPrivilegesVO">
+	<select id="selectAdminPriviletes" parameterClass="java.lang.Integer" resultClass="com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO">
 		select distinct p.priv_code privCode , p.priv_name privName , 
 		case when arr.priv_code is null then 'false' when arr.priv_code is not null then 'true' end has
 		from bp_privilege p
@@ -115,13 +115,6 @@
 			where rel.a_id = #adminId# and rel.rec_stat = 'Y' and rpr.PRIV_CODE is not null
 		) arr on arr.priv_code = p.priv_code
 
-	</select>
-	
-	<select id="queryLogInfoByLogId" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.OperateLog">
-		select 
-			params 
-		from l_operate_log o
-		where log_id = #logId#
 	</select>
 	
 	<!-- selectUserRecord -->
@@ -169,23 +162,4 @@
         </dynamic>
 	</select>
 	
-	<select id="selectAllPurviewProjectInfo" resultClass="com.fq.dao.entity.vo.project.PurviewProjectInfo">
-		select pi.pi_id  piId , pi.project_name projectName from bp_admin a 
-		right join 	bp_project_admin bp on a.a_id = bp.a_id 
-		left join 	p_project_info pi on bp.pi_id = pi.pi_id
-		where a.a_id = #adminId#
-	</select>
-	
-	<select id="selectAllProjectInfo" resultClass="com.fq.dao.entity.vo.project.PurviewProjectInfo">
-		select pi.pi_id piId , pi.project_name projectName from p_project_info pi 
-	</select>
-	
-	<delete id="deleteAdminProjectPrivilege" parameterClass="java.lang.Integer">
-		delete from bp_project_admin where a_id = #adminId#
-	</delete>
-	
-	<insert id="insertAdminProjectPrivilege" parameterClass="java.util.Map">
-		insert into bp_project_admin (a_id , pi_id) 
-							  values (#aId# , #piId#)
-	</insert>
 </sqlMap>

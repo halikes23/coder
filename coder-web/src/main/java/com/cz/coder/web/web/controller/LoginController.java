@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
+import com.cz.coder.common.constant.RetCode;
+import com.cz.coder.common.util.JnwtvStringUtils;
+import com.cz.coder.common.util.MD5Util;
 import com.cz.coder.web.common.exception.BusinessException;
 import com.cz.coder.web.common.properties.GlobalProperties;
 import com.cz.coder.web.common.util.BeanUtil;
@@ -27,9 +30,6 @@ import com.cz.coder.web.service.LoginService;
 import com.cz.coder.web.service.PrivilegeService;
 import com.cz.coder.web.web.form.login.ChgPsdForm;
 import com.cz.coder.web.web.form.login.LoginCheckForm;
-import com.fq.common.constant.RetCode;
-import com.fq.util.JnwtvStringUtils;
-import com.fq.util.MD5Util;
 
 @Controller
 public class LoginController extends BaseController {

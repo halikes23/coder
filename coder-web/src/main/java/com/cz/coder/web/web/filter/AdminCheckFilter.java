@@ -78,68 +78,11 @@ public class AdminCheckFilter implements Filter {
 			chain.doFilter(req, res);
 			return;
 		}
-		// 如果请求的路径与forwardUrl相同，或请求的路径是排除的URL时，则直接放行
-		if (servletPath.equals(forwardUrl)
-				|| servletPath.equals("/createMobileCode")
-				||  servletPath.equals("/loginOut")
-				||  servletPath.equals("/toLogin")
-				||  servletPath.equals("/shake")
-				|| excepUrlPattern.matcher(servletPath).matches()) {
-			chain.doFilter(req, res);
-			return;
-		}
-		
-		Object sessionObj = request.getSession().getAttribute(sessionkey);
-		
-		try {
-			
-			// 如果session为空，则跳转到指定页面
-			if (sessionObj == null) {
-					logger.error("用户信息为空");
-					request.getRequestDispatcher("/toLogin").forward(req, response);
-					return ;
-			}
-		} catch (Exception e) {
-			logger.error("", e);
-		}
 		
 		chain.doFilter(req, res);
 		
-		String method = request.getMethod();
-
-		JSONObject jsonRequest;
-		try {
-			jsonRequest = buildJsonRequest(req, request,
-					response, servletPath, sessionObj, method);
-			
-			logger.info(String.valueOf(jsonRequest));
-
-		} catch (Exception e) {
-			logger.error("",e);
-		}
-
-		
 	}
 
-	private JSONObject buildJsonRequest(ServletRequest req,
-			HttpServletRequest request, StatusExposingServletResponse response,
-			String servletPath, Object sessionObj, String method)
-			throws Exception {
-		JSONObject jsonRequest = JSONObject.fromObject(new Object());
-		jsonRequest.put("servletPath", servletPath);
-		jsonRequest.put("loginUser", sessionObj);
-
-		if (StringUtils.equals(method, "GET")) {
-
-			jsonRequest.put("params", request.getQueryString());
-		} else {
-			loadPostParams(req, request, jsonRequest);
-
-		}
-
-		jsonRequest.put("resStatus", response.getStatus());
-		return jsonRequest;
-	}
 
 	private void loadPostParams(ServletRequest req, HttpServletRequest request,
 			JSONObject jsonRequest) throws Exception {

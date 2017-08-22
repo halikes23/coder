@@ -8,6 +8,8 @@ import java.util.Map;
 import org.springframework.orm.ibatis.SqlMapClientCallback;
 import org.springframework.stereotype.Repository;
 
+import com.cz.coder.common.dao.BaseDAO;
+import com.cz.coder.common.util.JnwtvStringUtils;
 import com.cz.coder.web.dao.dao.privilege.PrivilegeDAO;
 import com.cz.coder.web.dao.entity.po.AdminPO;
 import com.cz.coder.web.dao.entity.po.RolePO;
@@ -16,8 +18,6 @@ import com.cz.coder.web.dao.entity.vo.privilege.ListAdminPrivilegesVO;
 import com.cz.coder.web.dao.entity.vo.privilege.ListAdminRolesVO;
 import com.cz.coder.web.dao.entity.vo.privilege.ListRolePrivilegesVO;
 import com.cz.coder.web.dao.entity.vo.privilege.RoleVO;
-import com.fq.dao.BaseDAO;
-import com.fq.util.JnwtvStringUtils;
 import com.ibatis.sqlmap.client.SqlMapExecutor;
 
 /**

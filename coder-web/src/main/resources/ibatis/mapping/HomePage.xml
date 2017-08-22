@@ -2,7 +2,7 @@
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap namespace="HomePageDaoImpl" >
-		<resultMap id="boutiqueprojectlists" class="com.fq.dao.entity.vo.project.BoutiqueProjectVO">
+		<resultMap id="boutiqueprojectlists" class="com.cz.coder.web.dao.entity.vo.project.BoutiqueProjectVO">
 			<result property="piId"                 column="pi_id"/>
 			<result property="projectName"          column="project_name"/>
 			<result property="projectCoverUrl"      column="cover_url"/>
@@ -15,7 +15,7 @@
 	        <result property="orderIndex"   		column="order_index"/>
 		</resultMap>
 		
-		<resultMap id="crowdfundingprojectlist" class="com.fq.dao.entity.vo.project.CrowdfundingVO">
+		<resultMap id="crowdfundingprojectlist" class="com.cz.coder.web.dao.entity.vo.project.CrowdfundingVO">
 			<result property="piId"                 			column="pi_id"/>
 			<result property="projectName"          			column="project_name"/>
 			<result property="projectCoverUrl"      			column="project_cover_url"/>
@@ -31,7 +31,7 @@
 			<result property="orderIndex"						column="order_index"/>
 		</resultMap>
 	
-		<resultMap class="com.fq.dao.entity.vo.ProjectInfoVO" id="projectInfoResult">
+		<resultMap class="com.cz.coder.web.dao.entity.vo.ProjectInfoVO" id="projectInfoResult">
 			<result property="piId"                 			column="pi_id"/>
 			<result property="projectName"          			column="project_name"/>
 		</resultMap>
@@ -169,14 +169,14 @@
 			where 		pi_id = #piId#
 		</update>
 		
-		<insert id="insertHomePage" parameterClass="com.fq.dao.entity.po.HomePagePO">
+		<insert id="insertHomePage" parameterClass="com.cz.coder.web.dao.entity.po.HomePagePO">
 			insert into sp_homepage
 				( m_id , title , is_use , write_date 	)
 			values
 				( #mId# , #title# , #isUse# , now()		)		
 		</insert>
 		
-		<select id="selectStartPage" resultClass="com.fq.dao.entity.vo.StartPageVO">
+		<select id="selectStartPage" resultClass="com.cz.coder.web.dao.entity.vo.StartPageVO">
 			select sp.sp_id spId , sp.img_qiniukey imgQiniuKey  , sp.update_date updateDate  , sp.is_deleted  isDeleted ,
 			sp.create_date createDate
 			from c_start_page  sp 
@@ -331,7 +331,7 @@
 		</select>
 		
 		<!-- 三方用户信息统计 -->
-		<select id="selectThirdUserInfo" parameterClass="java.lang.Integer" resultClass="com.fq.dao.entity.vo.privilege.AdminVO">
+		<select id="selectThirdUserInfo" parameterClass="java.lang.Integer" resultClass="com.cz.coder.web.dao.entity.vo.privilege.AdminVO">
 			select 
 			a.real_name realName , a.head_img_url imgUrl 
 			from bp_admin a 

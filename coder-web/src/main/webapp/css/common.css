@@ -123,12 +123,12 @@ td {white-space:nowrap;overflow:hidden;}
 .select-panel table tr td{width:120px;text-align: left;}
 .select-panel table tr td input,select,button{max-width:110px; width:110px;border:1px solid #eeeeee;}
 
-.result-wrap-jnwtv{padding:0px;width:100%;padding:0px 0px;}
-.result-wrap-jnwtv table{width:100%;margin: 10px;}
-.result-wrap-jnwtv table tr th{font-size:14px;color:#666666;text-align:left;}
-.result-wrap-jnwtv table tr td{font-size:14px;color:#666666;text-align:left;}
+.result-wrap-coder{padding:0px;width:100%;padding:0px 0px;}
+.result-wrap-coder table{width:100%;margin: 10px;}
+.result-wrap-coder table tr th{font-size:14px;color:#666666;text-align:left;}
+.result-wrap-coder table tr td{font-size:14px;color:#666666;text-align:left;}
 
-.page-wrapper-jnwtv{position:absolute;width:800px;margin:0px 50px;top:0px;left:0px;padding:0px 0px 0px 0px;}
+.page-wrapper-coder{position:absolute;width:1000px;margin:0px 50px;top:0px;left:0px;padding:0px 0px 0px 0px;}
 
 .mypagination table tr td:last-child{padding:0px;text-align: left;}
 

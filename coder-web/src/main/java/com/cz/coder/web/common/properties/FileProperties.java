@@ -3,8 +3,8 @@ package com.cz.coder.web.common.properties;
 import java.io.File;
 import java.util.Properties;
 
+import com.cz.coder.common.util.ConfigUtil;
 import com.cz.coder.web.common.constant.CoderWebConstant;
-import com.fq.util.ConfigUtil;
 
 /**
  * 文件参数信息

@@ -2,7 +2,7 @@
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap namespace="SpSysInfoDAO">
-	<resultMap class="com.fq.entity.vo.SystemInfoVO" id="systemInfoVO">
+	<resultMap class="com.cz.coder.common.entity.vo.SystemInfoVO" id="systemInfoVO">
 		<result property="spId" column="sys_para_id"/>
 		<result property="key1" column="key1"/>
 		<result property="key2" column="key2"/>
@@ -15,14 +15,14 @@
 		<result property="keyValue2" column="key_value2"/>
 		<result property="keyValue3" column="key_value3"/>
 	</resultMap>
-	<delete id="deleteSpSysInfo" parameterClass="com.fq.entity.SpSysInfo">
+	<delete id="deleteSpSysInfo" parameterClass="om.cz.coder.common.entity.SpSysInfo">
 	
 		delete from sp_sys_info
 		where key1 = #key1# and key2 = #key2# and key3 = #key3#
 	
 	</delete>
 
-	<insert id="insertSpSysInfo" parameterClass="com.fq.entity.SpSysInfo">
+	<insert id="insertSpSysInfo" parameterClass="om.cz.coder.common.entity.SpSysInfo">
 	
 		insert into sp_sys_info
 		(
@@ -56,7 +56,7 @@
 		)
 	</insert>
 
-	<update id="updateSpSysInfo" parameterClass="com.fq.entity.SpSysInfo">
+	<update id="updateSpSysInfo" parameterClass="om.cz.coder.common.entity.SpSysInfo">
 	
 		update sp_sys_info
 		set key_int		= #keyInt# , 
@@ -70,7 +70,7 @@
 				key3 = #key3#
 	</update>
 	
-	<select id="selectLevel3SpSysInfo" parameterClass="com.fq.common.spsysinfo.Level3SpSysInfoKey" resultClass="com.fq.entity.SpSysInfo">
+	<select id="selectLevel3SpSysInfo" parameterClass="om.cz.coder.common.common.spsysinfo.Level3SpSysInfoKey" resultClass="om.cz.coder.common.entity.SpSysInfo">
 		
 		select 
 			sys_para_id sysParaId ,
@@ -93,7 +93,7 @@
 		
 	</select>
 	
-	<select id="selectLevel2SpSysInfo" parameterClass="com.fq.common.spsysinfo.Level2SpSysInfoKey" resultClass="com.fq.entity.SpSysInfo">
+	<select id="selectLevel2SpSysInfo" parameterClass="om.cz.coder.common.spsysinfo.Level2SpSysInfoKey" resultClass="om.cz.coder.common.entity.SpSysInfo">
 		
 		select 
 			sys_para_id sysParaId ,
@@ -116,7 +116,7 @@
 		
 	</select>
 	
-	<select id="selectLevel1SpSysInfo" parameterClass="java.lang.String" resultClass="com.fq.entity.SpSysInfo">
+	<select id="selectLevel1SpSysInfo" parameterClass="java.lang.String" resultClass="om.cz.coder.common.entity.SpSysInfo">
 		
 		select 
 			sys_para_id sysParaId ,
@@ -138,7 +138,7 @@
 		
 	</select>
 	
-	<select id="selectAllSpSysInfo" resultClass="com.fq.entity.SpSysInfo">
+	<select id="selectAllSpSysInfo" resultClass="om.cz.coder.common.entity.SpSysInfo">
 		
 		select 
 			sys_para_id sysParaId ,
@@ -228,7 +228,7 @@
 		</dynamic>
 	</select>
 	<!-- 修改系统参数表 -->
-	<update id="updateSystemParam" parameterClass="com.fq.entity.vo.SystemInfoVO">
+	<update id="updateSystemParam" parameterClass="om.cz.coder.common.entity.vo.SystemInfoVO">
 		update sp_sys_info ssi set 
 			ssi.key1=#key1#,ssi.key2=#key2#,ssi.key3=#key3#,
 			ssi.key_name = #keyName#,ssi.key_int = #keyInt#,ssi.key_date = #keyDate#,
@@ -241,7 +241,7 @@
 		delete from sp_sys_info where sys_para_id=#spId#
 	</delete>
 	<!-- 添加系统参数 -->
-	<insert id="addSystemParam" parameterClass="com.fq.entity.vo.SystemInfoVO">
+	<insert id="addSystemParam" parameterClass="om.cz.coder.common.entity.vo.SystemInfoVO">
 		insert into sp_sys_info 
 			(key1,key2,key3,key_name,key_int,key_date,key_float,
 				key_value1,key_value2,key_value3)

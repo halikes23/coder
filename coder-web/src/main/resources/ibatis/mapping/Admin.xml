@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<!--add by iBatisTool a_acct-->
+<sqlMap namespace="AdminDaoImpl">
+	<resultMap id="adminVO" class="com.cz.coder.web.dao.entity.vo.privilege.AdminVO">
+		<result property="adminId" column="a_id"/>
+		<result property="userName" column="user_name"/>
+		<result property="realName" column="real_name"/>
+		<result property="pwd" column="pwd"/>
+		<result property="isUse" column="is_use"/>
+		<result property="adminPhone" column="phone"/>
+	</resultMap>
+	<resultMap id="adminporesult" class="com.cz.coder.web.dao.entity.vo.privilege.AdminVO">
+		<result property="adminId" column="a_id"/>
+		<result property="userName" column="user_name"/>
+		<result property="pwd" column="pwd"/>
+		<result property="isUse" column="is_use"/>
+		<result property="adminPhone" column="phone"/>
+		<result property="isManager" column="is_manager"/>
+		<result property="department" column="department"/>
+		<result property="mail" column="mail"/>
+	</resultMap>
+	<resultMap id="mobileCodeResult" class="com.cz.coder.web.dao.entity.vo.LoginVO">
+		<result property="adminName" column="user_name"/>
+		<result property="userMobile" column="user_mobile"/>
+		<result property="mobileCode" column="mobile_code"/>
+	</resultMap>
+	
+	
+	<!-- check login -->
+	<select id="checkLogin" resultMap="adminVO" parameterClass="com.cz.coder.web.web.form.login.LoginCheckForm">
+		select 		* 
+		from 		bp_admin 	a 
+		where 		a.user_name = #userName#   and  	a.pwd = #pwd#   and 		a.is_use = 1 
+	</select>	
+	<!--checkAdminInfo 检查用户是否存在信息  -->
+	<select id="checkAdminInfo"  resultMap="adminporesult"  parameterClass="java.util.Map" >
+		select 		* 
+		from 		bp_admin 	a 
+		where 		a.user_name = #userName#  and  a.is_use = 1 
+	</select>
+	
+	<!--mobileCodeCheck 验证短信验证码是否在有效期  -->
+	<select id="mobileCodeCheck" parameterClass="java.util.Map" resultMap="mobileCodeResult">
+		select 		* 
+		from 		bp_console_login_mobile_code cmc 
+		where 		cmc.user_name = #adminName#  		and   			cmc.mobile_code= #mobileCode#  		and  			
+					timestampdiff( second,cmc.send_date,#now# )  &lt;  #validityOfMobileCode#	
+	</select>
+	
+	<update id="updateAdminPsd" parameterClass="java.util.Map" >
+		update bp_admin set pwd = #newPsd# where user_name = #adminName# and pwd =#oldPsd#
+	</update>
+	
+	<!--delateMobileCode   -->
+	<delete id="deleteMobileCode"  parameterClass="com.cz.coder.web.web.form.login.LoginCheckForm"  >
+	delete 
+	from bp_console_login_mobile_code
+	where mobile_code=#mobileCode#
+	</delete>
+	
+	<select id="selectAdminById" resultMap="adminVO" parameterClass="java.lang.Integer">
+		select 		* 
+		from 		bp_admin 	a 
+		where 		a.a_id = #adminId#
+	</select>
+	
+	<select id="checkAdmin" resultMap="adminVO" parameterClass="java.util.HashMap">
+		select 		* 
+		from 		bp_admin 	a 
+		where 		a.user_name = #userName#   and  	a.pwd = #pwd#   and 		a.is_use = 1 
+	</select>	
+	
+</sqlMap>

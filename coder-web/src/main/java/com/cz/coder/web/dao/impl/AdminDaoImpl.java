@@ -4,11 +4,11 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.cz.coder.common.dao.BaseDAO;
 import com.cz.coder.web.dao.dao.AdminDAO;
 import com.cz.coder.web.dao.entity.vo.LoginVO;
 import com.cz.coder.web.dao.entity.vo.privilege.AdminVO;
 import com.cz.coder.web.web.form.login.LoginCheckForm;
-import com.fq.dao.BaseDAO;
 
 /**
  * 

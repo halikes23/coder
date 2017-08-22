@@ -18,9 +18,9 @@
 	<!-- <mvc:annotation-driven /> -->
 	<mvc:view-controller path="/"/>
 	<!-- 自动扫描的包名 -->
-	<context:component-scan base-package="com.fq.dao,com.fq.dao.impl,com.fq.controller,com.fq.app,com.fq.service,com.fq.sms,com.fq.domain,
-			ibatis.mapping,rongcloud,com.fq.util,com.fq.request,com.fq.dao,com.fq.common.spsysinfo,
-			com.fq.task" />
+	<context:component-scan base-package="com.cz.coder.web.dao,com.cz.coder.web.dao.impl,com.cz.coder.web.web.controller,
+		com.cz.coder.web.service,com.fq.sms,com.fq.domain,ibatis.mapping,
+		com.cz.coder.util,com.cz.coder.common.spsysinfo,com.cz.coder.common.dao" />
 	
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -42,7 +42,7 @@
 	</bean>
 	<mvc:annotation-driven>
 		<mvc:argument-resolvers>
-			<bean class="com.fq.auth.CurrentUserMethodArgumentReslover" />
+			<bean class="com.cz.coder.web.auth.CurrentUserMethodArgumentReslover" />
 		</mvc:argument-resolvers>
 	</mvc:annotation-driven>
 	<mvc:default-servlet-handler />
@@ -50,7 +50,7 @@
 	<!-- 视图解释类 -->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="WEB-INF/admin" />
+		<property name="prefix" value="WEB-INF/pages" />
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
@@ -60,8 +60,8 @@
        <property name="locations">  
            <list>  
             <!--   <value>classpath:mysql.properties</value>   -->
-              <value> file:/data/jnwtv/resource/third-console/jdbc.properties</value>
-              <value> file:/data/jnwtv/resource/third-console/Global.properties</value>
+              <value> file:/data/cz/coder/resource/web/jdbc.properties</value>
+              <value> file:/data/cz/coder/resource/web/Global.properties</value>
            </list>  
        </property>  
     </bean>
@@ -113,15 +113,10 @@
 
 	<aop:config>
 		<aop:pointcut id="interceptorPointCuts"
-			expression="execution(* com.fq.service..*.*(..))" />
+			expression="execution(* com.cz.coder.web.service..*.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts" />
 	</aop:config>
 	
-	<aop:config>
-    	<aop:pointcut id="interceptorPointCuts"
-			expression="execution(* com.fq.task..*.*(..))" />
-		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts" />
-	</aop:config>
 	<!-- 表单验证 -->
 	<bean id="validatorFactory" class="org.springmodules.validation.commons.DefaultValidatorFactory" >
 		<property name="validationConfigLocations">

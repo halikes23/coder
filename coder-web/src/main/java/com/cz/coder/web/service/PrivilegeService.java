@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cz.coder.common.constant.RetCode;
+import com.cz.coder.common.util.JnwtvStringUtils;
+import com.cz.coder.common.util.MD5Util;
 import com.cz.coder.web.common.util.page.PageInfo;
 import com.cz.coder.web.common.util.page.PageUtil;
 import com.cz.coder.web.dao.dao.privilege.PrivilegeDAO;
@@ -27,9 +30,6 @@ import com.cz.coder.web.web.form.privilege.SaveAdminForm;
 import com.cz.coder.web.web.form.privilege.SaveAdminRolesForm;
 import com.cz.coder.web.web.form.privilege.SaveRoleForm;
 import com.cz.coder.web.web.form.privilege.SaveRolePrivilegesForm;
-import com.fq.common.constant.RetCode;
-import com.fq.util.JnwtvStringUtils;
-import com.fq.util.MD5Util;
 
 
 /**
