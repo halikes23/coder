@@ -58,7 +58,12 @@
                 <div id="sidebar" class="sidebar-nav navbar-collapse" style="width:150px;height:700px;border-right-style: solid;border-width: 1px">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a href="toListDatabases" style="font-size: 18;" target="main"><i class="fa fa-home fa-fw"></i> 代码生成</a>
+                            <a href="toListDatabases" style="font-size: 18;" target="main"><i class="fa fa-home fa-fw"></i> 数据结构</a>
+                        </li>
+                    </ul>
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="toListDatabases" style="font-size: 18;" target="main"><i class="fa fa-home fa-fw"></i> 接口文档</a>
                         </li>
                     </ul>
                 </div>

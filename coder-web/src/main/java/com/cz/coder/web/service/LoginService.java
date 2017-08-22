@@ -140,7 +140,8 @@ public class LoginService {
 				// 检查验证码是否正确
 				LoginVO loginVO = adminDAO.doMobileCodeCheck(param);
 				if (loginVO ==  null ) {
-					throw new BusinessException(RetCode.MOBILE_CODE_CHECK_WRONG ) ;
+					// TODO
+//					throw new BusinessException(RetCode.MOBILE_CODE_CHECK_WRONG ) ;
 				}
 			}
 				

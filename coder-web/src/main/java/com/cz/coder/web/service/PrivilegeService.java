@@ -75,7 +75,7 @@ public class PrivilegeService {
 			AdminVO admin = privilegeDAO.selectAdminByUserName(form.getUserName());
 			
 			if( admin != null ){
-				return RetCode.ADMIN_HAS_EXISTS ;
+				//return RetCode.ADMIN_HAS_EXISTS ;
 			}
 			
 			AdminPO po = new AdminPO() ;

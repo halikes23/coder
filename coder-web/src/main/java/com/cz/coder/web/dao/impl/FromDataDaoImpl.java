@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.cz.coder.common.dao.BaseDAO;
 import com.cz.coder.common.entity.vo.ColumnVO;
-import com.cz.coder.web.dao.dao.CoderDao;
+import com.cz.coder.web.dao.dao.FromDataDao;
 
 /**
  * 
@@ -18,7 +18,7 @@ import com.cz.coder.web.dao.dao.CoderDao;
  * @date 2016-2-26
  */
 @Repository
-public class CoderDaoImpl extends BaseDAO implements CoderDao {
+public class FromDataDaoImpl extends BaseDAO implements FromDataDao {
 
 	@Override
 	public List<String> selectAllDatabases() {

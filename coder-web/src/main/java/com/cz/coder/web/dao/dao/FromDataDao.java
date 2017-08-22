@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.cz.coder.common.entity.vo.ColumnVO;
 
-public interface CoderDao {
+public interface FromDataDao {
 
 	List<String> selectAllDatabases() ;
 

@@ -21,39 +21,9 @@
 	<context:component-scan base-package="com.cz.coder.web.dao,com.cz.coder.web.dao.impl,com.cz.coder.web.web.controller,
 		com.cz.coder.web.service,com.fq.sms,com.fq.domain,ibatis.mapping,
 		com.cz.coder.util,com.cz.coder.common.spsysinfo,com.cz.coder.common.dao" />
-	
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
-	<mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**" />
-			<bean class="com.cz.coder.web.web.interceptor.LoginInterceptor">
-				<property name="sessionUser" value="LOGINUSER" />
-			</bean>
-		</mvc:interceptor>
-	</mvc:interceptors>
-	<bean id="multipartResolver"
-		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<property name="defaultEncoding" value="UTF-8" />
-		<!-- 指定所上传文件的总大小不能超过200MB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
-		<property name="maxUploadSize" value="209715200" />
-	</bean>
-	<mvc:annotation-driven>
-		<mvc:argument-resolvers>
-			<bean class="com.cz.coder.web.auth.CurrentUserMethodArgumentReslover" />
-		</mvc:argument-resolvers>
-	</mvc:annotation-driven>
-	<mvc:default-servlet-handler />
-
-	<!-- 视图解释类 -->
-	<bean id="viewResolver"
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix" value="WEB-INF/pages" />
-		<property name="suffix" value=".jsp" />
-	</bean>
-	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+		
 	<!-- 获取配置文件 -->  
     <bean id="config"  
        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
@@ -65,89 +35,11 @@
            </list>  
        </property>  
     </bean>
-	
-	<!-- 获取数据源 -->
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		
-		<property name="driverClassName"><value>${db.driveClassName}</value></property>
-		<property name="url"><value>${db.url}</value></property>
-		<property name="username"><value>${db.username}</value></property>
-		<property name="password"><value>${db.password}</value></property>
-		<property name="initialSize"><value>${db.initialSize}</value></property>
-		<property name="maxActive"><value>${db.maxActive}</value></property>
-	</bean>
+	<import resource="spring-mvc"/>
 	
+	<import resource="spring-dao"/>
 	
-	<!--根据sqlMapClien创建一个SqlMapClient模版类-->
-	<bean id="dataIndexSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate"> 
-		<property name="sqlMapClient" ref="sqlMapClient"/>  
-    </bean>
+	<import resource="spring-message"/>
 	
-	<!-- 配置SqlMapClient对象 -->  
-	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">  
-		<property name="configLocation">  <!-- name 为configLocation或s  不可为其他 -->  
-			<value>classpath:ibatis/mapping/SqlMapConfig.xml</value> <!-- 不区分大小写，路径前可加'/' -->  
-		</property>  
-		  
-		<!-- dataSource不是必需 -->  
-		<property name="dataSource" ref="dataSource" />  
-	</bean>
-
-	<bean id="transactionManager"
-	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource"></property>
-	</bean>
-
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
-		<tx:attributes>
-			<tx:method name="delete*" 	propagation="REQUIRED" />
-			<tx:method name="insert*" 	propagation="REQUIRED" />
-			<tx:method name="add*" 		propagation="REQUIRED" />
-			<tx:method name="update*" 	propagation="REQUIRED" />
-			<tx:method name="save*" 	propagation="REQUIRED" />
-			<tx:method name="create*" 	propagation="REQUIRED" />
-			<tx:method name="clear*" 	propagation="REQUIRED" />
-			<tx:method name="do*" 		propagation="REQUIRED" />
-		</tx:attributes>
-	</tx:advice>
-
-	<aop:config>
-		<aop:pointcut id="interceptorPointCuts"
-			expression="execution(* com.cz.coder.web.service..*.*(..))" />
-		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts" />
-	</aop:config>
-	
-	<!-- 表单验证 -->
-	<bean id="validatorFactory" class="org.springmodules.validation.commons.DefaultValidatorFactory" >
-		<property name="validationConfigLocations">
-			<list>
-				<value>WEB-INF/validator/validation.xml</value>
-				<value>WEB-INF/validator/validator-rules.xml</value>
-			</list>
-		</property>
-	</bean>
-	
-	<bean id="validator" class="org.springmodules.validation.commons.DefaultBeanValidator">
-		<property name="validatorFactory" ref="validatorFactory"/>
-	</bean>
-	
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">  
-        <property name="basename" value="messages" />  
-    </bean>
-    
-    <bean id="mailSender" class="com.fq.message.sender.MailSender">
-    	<property name="host" value="${Global.MAIL_SENDER_HOST}"/>
-    	<property name="port" value="${Global.MAIL_SENDER_PORT}" />
-    	<property name="transportProtocol" value="${Global.MAIL_SENDER_TRANSPORT_PROTOCOL}" />
-    	<property name="from" value="${Global.MAIL_SENDER_FROM}" />
-    	<property name="fromPwd" value="${Global.MAIL_SENDER_FROM_PWD}" /> 
-    	<property name="isSSL" value="${Global.MAIL_SENDER_IS_SSL}"/>
-    </bean>
-    
-    <bean id="cLSmsSender" class="com.fq.message.sender.CLSmsSender">
-    	<property name="uri" ><value>${Global.SMS_URL}</value></property>
-		<property name="clAccount" ><value>${Global.SMS_USERNAME}</value></property>
-		<property name="clPwd" ><value>${Global.SMS_PSD}</value></property>
-    </bean>
-    
 </beans>
