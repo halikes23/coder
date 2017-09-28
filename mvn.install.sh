@@ -1,3 +1,7 @@
+export MAVEN_HOME=/usr/local/maven-coder
+export PATH=$MAVEN_HOME/bin:$PATH
+echo $PATH
+
 PROJECT="$1"
 
 if  [ "$PROJECT" != "" ] && [ "$PROJECT" != "common" -a "$PROJECT" != "message" -a "$PROJECT" != "web" ] ;

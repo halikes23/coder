@@ -17,7 +17,7 @@ public class CoderService {
 		
 		File file = new File("/usr/local/coder/conf/coder.conf");
 		
-		if(file.exists()){
+		if(!file.exists()){
 			logger.info("系统没有初始化！");
 			return true ;
 		}

@@ -36,10 +36,10 @@
        </property>  
     </bean>
 		
-	<import resource="spring-mvc"/>
+	<import resource="spring-mvc.xml"/>
 	
-	<import resource="spring-dao"/>
+	<import resource="spring-dao.xml"/>
 	
-	<import resource="spring-message"/>
+	<import resource="spring-message.xml"/>
 	
 </beans>

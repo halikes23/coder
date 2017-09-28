@@ -22,12 +22,12 @@ public class FromDataDaoImpl extends BaseDAO implements FromDataDao {
 
 	@Override
 	public List<String> selectAllDatabases() {
-		return (List<String>)this.getSqlMapClientTemplate().queryForList("Coder.selectAllDatabases");
+		return (List<String>)this.getSqlMapClientTemplate().queryForList("FromData.selectAllDatabases");
 	}
 
 	@Override
 	public List<String> selectTablesBySchema(String schema) {
-		return (List<String>)this.getSqlMapClientTemplate().queryForList("Coder.selectTablesByDatabase",schema);
+		return (List<String>)this.getSqlMapClientTemplate().queryForList("FromData.selectTablesByDatabase",schema);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class FromDataDaoImpl extends BaseDAO implements FromDataDao {
 		Map<String,Object> params = new HashMap<String,Object>() ;
 		params.put("schema", schema) ;
 		params.put("table", table) ;
-		return (List<ColumnVO>)this.getSqlMapClientTemplate().queryForList("Coder.selectColumnsByTable",params);
+		return (List<ColumnVO>)this.getSqlMapClientTemplate().queryForList("FromData.selectColumnsByTable",params);
 	}
 
 

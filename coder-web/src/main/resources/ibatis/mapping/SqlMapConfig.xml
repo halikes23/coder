@@ -8,5 +8,6 @@ PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
 	<sqlMap   resource="ibatis/mapping/Login.xml"/>
 	<sqlMap   resource="ibatis/mapping/Privilege.xml"/>
 	<sqlMap   resource="ibatis/mapping/Admin.xml"/>
-	<sqlMap   resource="ibatis/mapping/Coder.xml"/>
+	<sqlMap   resource="ibatis/mapping/FromData.xml"/>
+	<sqlMap   resource="ibatis/mapping/FromInterfaceFile.xml"/>
 </sqlMapConfig>

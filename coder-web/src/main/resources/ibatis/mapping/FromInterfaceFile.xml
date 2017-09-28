@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<!--add by iBatisTool a_acct-->
+<sqlMap namespace="FromInterfaceFile">
+	
+	<resultMap id="interfaceFile" class="com.cz.coder.common.entity.vo.InterfaceFileVO">
+		<result column="if_id" property="ifId"/>
+		<result column="file_path" property="filePath"/>
+		<result column="interface_name" property="interfaceName"/>
+	</resultMap>
+	
+	<select id="selectInterfaceFiles" resultMap="interfaceFile" parameterClass="java.lang.String">
+		select * from i_interface_file iif
+		<dynamic prepend="where">
+			<isNotEmpty property="interfaceName" > iif.interface_name like concat( #interfaceName# , '%') </isNotEmpty>
+		</dynamic>
+	</select>
+	
+<!-- 	<insert id="insertiInterfaceFile" parameterClass="iInterfaceFile" > -->
+<!-- 	insert into i_interface_file	( -->
+<!-- 		if_id,		file_path,		interface_name -->
+
+<!-- 	) -->
+<!-- 	values	( -->
+<!-- 		#ifId#,		#filePath#,		#interfaceName# -->
+
+<!-- 	) -->
+<!-- </insert> -->
+	
+</sqlMap>

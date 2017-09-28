@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="LoginDaoImpl" >
+	<resultMap id="mobileCodeResult" class="com.codepandas.jscalpel.web.sys.entity.vo.MobileCodeVO">
+		<result property="userName" column="user_name"/>
+		<result property="userMobile" column="user_mobile"/>
+		<result property="mobileCode" column="mobile_code"/>
+		<result property="sendDate" column="send_date"/>
+	</resultMap>
+	<!-- 查询有效的短信验证码  -->
+	<select id="selectMobileCodePo" parameterClass="java.util.Map"  resultMap="mobileCodeResult" >
+		select 		*  
+		from  		bp_console_login_mobile_code   cmc    
+		where 		cmc.user_name = #userName#   
+					and 		timestampdiff( second,cmc.send_date,now() )  &lt; #validityOfMobileCode#
+	</select>
+	<!--insertMobileCode   -->
+	<insert id="insertMobileCode"  parameterClass="com.codepandas.jscalpel.web.sys.entity.po.MobileCodePO"  >
+		insert 			into  			bp_console_login_mobile_code    
+						(     	user_name   ,   			user_mobile   ,    			mobile_code   ,  		send_date   )
+						values			
+						(		#userName#  ,				#userMobile#,				#mobileCode#,			#sendDate# )
+	
+	</insert>
+	
+	<select id="shake" resultClass="java.lang.Integer">
+			select 1
+	</select>	
+	
+</sqlMap>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			">
+	
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">  
+        <property name="basename" value="messages" />  
+    </bean>
+    
+    <bean id="mailSender" class="com.fq.message.sender.MailSender">
+    	<property name="host" value="${Global.MAIL_SENDER_HOST}"/>
+    	<property name="port" value="${Global.MAIL_SENDER_PORT}" />
+    	<property name="transportProtocol" value="${Global.MAIL_SENDER_TRANSPORT_PROTOCOL}" />
+    	<property name="from" value="${Global.MAIL_SENDER_FROM}" />
+    	<property name="fromPwd" value="${Global.MAIL_SENDER_FROM_PWD}" /> 
+    	<property name="isSSL" value="${Global.MAIL_SENDER_IS_SSL}"/>
+    </bean>
+    
+    <bean id="cLSmsSender" class="com.fq.message.sender.CLSmsSender">
+    	<property name="uri" ><value>${Global.SMS_URL}</value></property>
+		<property name="clAccount" ><value>${Global.SMS_USERNAME}</value></property>
+		<property name="clPwd" ><value>${Global.SMS_PSD}</value></property>
+    </bean>
+	
+	
+    
+</beans>

@@ -33,7 +33,7 @@ public class FromDataController {
 		Map<String,Object> model = Maps.newHashMap() ;
 		model.put("databases", databases) ;
 		
-		return new ModelAndView("/coder/listDatabases",model);
+		return new ModelAndView("/coder/fromdb/listDatabases",model);
 		
 		
 	}
@@ -46,7 +46,7 @@ public class FromDataController {
 		Map<String,Object> model = Maps.newHashMap() ;
 		model.put("tables", tables) ;
 		model.put("schema", schema) ;
-		return new ModelAndView("/coder/listTables",model);
+		return new ModelAndView("/coder/fromdb/listTables",model);
 		
 		
 	}
@@ -61,7 +61,7 @@ public class FromDataController {
 		model.put("schema", form.getSchema()) ;
 		model.put("table",form.getTable()) ;
 		
-		return new ModelAndView("/coder/tableDetail",model);
+		return new ModelAndView("/coder/fromdb/tableDetail",model);
 		
 		
 	}
@@ -73,7 +73,7 @@ public class FromDataController {
 			Map<String,Object> model = new HashMap<String,Object>() ;
 			Map<String,Object> result = this.fromDataService.buildCode(form.getPkg() , form.getSchema() , form.getTable()) ;
 			model.putAll(result);
-			return new ModelAndView("/coder/script",model);
+			return new ModelAndView("/coder/fromdb/script",model);
 		}catch(Exception e){
 			logger.error("",e);
 			return null ;
