@@ -27,8 +27,8 @@ public class GlobalProperties {
     // 你生成的私钥路径
 	public final static String PINGPP_PUBLIC_KEY_FILE_PATH = "/data/jnwtv/resource/schedule/rsa_public_key.pem";
 	public final static String PINGPP_PRIVATE_KEY_FILE_PATH = "/data/jnwtv/resource/schedule/rsa_private_key.pem";
-	public static String PINGPP_API_KEY_LIVE =  "sk_live_HWzzzHKKuzv99COKqHqX94uP" ; // pingppapikey
-	public static String PINGPP_API_KEY_TEST =  "sk_test_Kq1GyHirDCm9SqH8W1Ca9af5" ; // pingppapikey
+	public static String PINGPP_API_KEY_LIVE  ; // pingppapikey
+	public static String PINGPP_API_KEY_TEST  ; // pingppapikey
 	
 	static{
 		Properties prop = ConfigUtil.readProperty( CoderWebConstant.CFG_BASE_PATH +"Global.properties" ) ;
